@@ -11,7 +11,7 @@ except KeyError:
     print('no discord token idiot')
     sys.exit(1)
 
-intents = discord.Intents(messages=True, reactions=True, guilds=True)
+intents = discord.Intents(messages=True, reactions=True, guilds=True, message_content=True)
 client = discord.Client(intents=intents)
 
 
