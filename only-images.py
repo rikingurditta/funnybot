@@ -4,6 +4,7 @@ import sys
 
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
+IMAGES_CHANNEL_NAME = 'images'
 
 try:
     os.environ['DISCORD_TOKEN']
@@ -25,7 +26,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content != '' or len(message.attachments) == 0:
+    if (message.content != '' or len(message.attachments) == 0) and message.channel.name == IMAGES_CHANNEL_NAME:
+        print(f'deleting non only image in #{IMAGES_CHANNEL_NAME}')
+        print(message.channel.name)
         await message.delete()
 
 
@@ -44,13 +47,13 @@ async def on_raw_reaction_add(raw_reaction_event):
     if raw_reaction_event.emoji.name == '⭐':
         for react in reactions:
             if react.emoji == '⭐' and react.count == STAR_THRESHOLD:
-                print('starring')
+                print(f'starring {STAR_THRESHOLD}x⭐')
                 await message.pin()
 
-    elif raw_reaction_event.emoji.name == '👎':
+    elif raw_reaction_event.emoji.name == '👎' and message.channel.name == IMAGES_CHANNEL_NAME:
         for react in reactions:
             if react.emoji == '👎' and react.count >= DEL_THRESHOLD:
-                print('deleting')
+                print(f'deleting {DEL_THRESHOLD}x👎')
                 await message.delete()
                 break
 
