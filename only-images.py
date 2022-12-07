@@ -1,10 +1,14 @@
 import discord
 import os
 import sys
+import datetime
+from discord.ext import tasks
+from discord import TextChannel
 
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
 IMAGES_CHANNEL_NAME = 'images'
+HI_CHAT_ID = 1032482927394693178
 
 try:
     os.environ['DISCORD_TOKEN']
@@ -19,10 +23,15 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+    purge_hi_chat_loop.start()
 
 
 @client.event
 async def on_message(message):
+    if message.channel.id == HI_CHAT_ID:
+        print(f'deleting {message.content} in 15 minutes')
+        await message.delete(delay=900)
+
     if message.author == client.user:
         return
 
@@ -44,9 +53,11 @@ async def on_raw_reaction_add(raw_reaction_event):
                                       raw_reaction_event.message_id)
     reactions = message.reactions
 
+    print("reaction {}".format(raw_reaction_event.emoji.name))
+
     if raw_reaction_event.emoji.name == '⭐':
         for react in reactions:
-            if react.emoji == '⭐' and react.count == STAR_THRESHOLD:
+            if react.emoji == '⭐' and react.count >= STAR_THRESHOLD:
                 print(f'starring {STAR_THRESHOLD}x⭐')
                 await message.pin()
 
@@ -57,5 +68,22 @@ async def on_raw_reaction_add(raw_reaction_event):
                 await message.delete()
                 break
 
+
+async def purge_hi_chat():
+    print('purging hi chat')
+    channel: TextChannel = client.get_channel(HI_CHAT_ID)
+
+    try:
+        async for msg in channel.history(limit=500):
+            if msg.created_at < datetime.datetime.now() - datetime.timedelta(minutes=15):
+                print(f'deleting {msg.content} through 15 min loop')
+                await msg.delete()
+    except:
+        pass
+
+
+@tasks.loop(minutes=15)
+async def purge_hi_chat_loop():
+    await purge_hi_chat()
 
 client.run(os.environ['DISCORD_TOKEN'])
