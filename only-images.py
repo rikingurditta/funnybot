@@ -29,7 +29,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.channel.id == HI_CHAT_ID:
-        print(f'deleting {message.content} in 15 minutes')
+        print(f'deleting {msg.id} in 15 minutes')
         await message.delete(delay=900)
 
     if message.author == client.user:
@@ -76,7 +76,7 @@ async def purge_hi_chat():
     try:
         async for msg in channel.history(limit=500):
             if msg.created_at < datetime.datetime.now() - datetime.timedelta(minutes=15):
-                print(f'deleting {msg.content} through 15 min loop')
+                print(f'deleting {msg.id} through 15 min loop')
                 await msg.delete()
     except:
         pass
