@@ -29,7 +29,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.channel.id == HI_CHAT_ID:
-        print(f'deleting {msg.id} in 15 minutes')
+        print(f'deleting {message.id} in 15 minutes')
         await message.delete(delay=900)
 
     if message.author == client.user:
