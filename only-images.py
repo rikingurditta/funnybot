@@ -12,7 +12,7 @@ STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
 IMAGES_CHANNEL_NAME = "images"
 HI_CHAT_ID = 1032482927394693178
-tz = pytz.timezone('Canada/Eastern')
+tz = pytz.timezone("Canada/Eastern")
 
 try:
     os.environ["DISCORD_TOKEN"]
@@ -92,13 +92,14 @@ async def purge_hi_chat():
         print(
             "msg created at: {}, now: {}, now - 15min: {}".format(
                 msg.created_at.astimezone(pytz.utc),
-                datetime.datetime.utcnow().astimezone(pytz.utc),
-                datetime.datetime.utcnow().astimezone(pytz.utc) - datetime.timedelta(minutes=15),
+                tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc),
+                tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc)
+                - datetime.timedelta(minutes=15),
             )
         )
-        if msg.created_at.astimezone(pytz.utc) < datetime.datetime.utcnow().astimezone(pytz.utc) - datetime.timedelta(
-                minutes=15
-        ):
+        if msg.created_at.astimezone(pytz.utc) < tz.normalize(
+            datetime.datetime.now(tz)
+        ).astimezone(pytz.utc) - datetime.timedelta(minutes=15):
             print(f"deleting {msg.id} through 15 min loop")
             await msg.delete()
             sleep(2)
