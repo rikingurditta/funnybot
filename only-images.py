@@ -34,6 +34,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    if "cum" in message.content.lower():
+        await message.add_reaction("<:lfg:961074481219117126>")
+
     if message.channel.id == HI_CHAT_ID:
         print(f"deleting {message.id} in 15 minutes")
         await message.delete(delay=900)
