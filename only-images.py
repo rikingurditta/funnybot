@@ -6,7 +6,7 @@ import os
 import sys
 import datetime
 from discord.ext import tasks
-from discord import TextChannel, RawReactionActionEvent, Embed
+from discord import TextChannel, RawReactionActionEvent, Embed, Message
 import pytz
 
 STAR_THRESHOLD = 5
@@ -65,7 +65,7 @@ async def get_message_by_id(guild_id, channel_id, message_id):
 
 @client.event
 async def on_raw_reaction_add(raw_reaction_event: RawReactionActionEvent):
-    message = await get_message_by_id(
+    message: Message = await get_message_by_id(
         raw_reaction_event.guild_id,
         raw_reaction_event.channel_id,
         raw_reaction_event.message_id,
@@ -93,7 +93,7 @@ async def on_raw_reaction_add(raw_reaction_event: RawReactionActionEvent):
                     name=message.author.display_name, icon_url=message.author.avatar
                 )
 
-                footer = f'{message.guild.name} | #{bestof_channel.name}'
+                footer = f'{message.guild.name} | #{message.channel.name}'
                 embed.set_footer(text=footer)
                 txt = f'{react.emoji} #** {react.count} **'
 
