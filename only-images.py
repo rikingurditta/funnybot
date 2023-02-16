@@ -1,3 +1,4 @@
+import asyncio
 from time import sleep
 
 import discord
@@ -5,13 +6,14 @@ import os
 import sys
 import datetime
 from discord.ext import tasks
-from discord import TextChannel
+from discord import TextChannel, RawReactionActionEvent, Embed
 import pytz
 
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
 IMAGES_CHANNEL_NAME = "images"
 HI_CHAT_ID = 1032482927394693178
+BESTOF_CHANNEL_ID = 1075618133571809281
 tz = pytz.timezone("Canada/Eastern")
 
 try:
@@ -53,13 +55,16 @@ async def on_message(message):
 
 
 async def get_message_by_id(guild_id, channel_id, message_id):
-    channel = client.get_guild(guild_id).get_channel(channel_id)
+    guild = await client.fetch_guild(guild_id)
+    # print(guild)
+    channel = await guild.fetch_channel(channel_id)
+    # print(channel)
     message = await channel.fetch_message(message_id)
     return message
 
 
 @client.event
-async def on_raw_reaction_add(raw_reaction_event):
+async def on_raw_reaction_add(raw_reaction_event: RawReactionActionEvent):
     message = await get_message_by_id(
         raw_reaction_event.guild_id,
         raw_reaction_event.channel_id,
@@ -73,7 +78,50 @@ async def on_raw_reaction_add(raw_reaction_event):
         for react in reactions:
             if react.emoji == "⭐" and react.count >= STAR_THRESHOLD:
                 print(f"starring {STAR_THRESHOLD}x⭐")
-                await message.pin()
+                bestof_channel = await client.fetch_channel(BESTOF_CHANNEL_ID)
+                bestof_msg = (
+                        f'{message.content}\n\n[Click Here to view context]({message.jump_url})'
+                    )
+                author_member = await message.guild.fetch_member(message.author.id)
+                embed = Embed(
+                    color=author_member.top_role.color,
+                    description=bestof_msg,
+                    timestamp=message.created_at,
+                )
+
+                embed.set_author(
+                    name=message.author.display_name, icon_url=message.author.avatar
+                )
+
+                footer = f'{message.guild.name} | #{bestof_channel.name}'
+                embed.set_footer(text=footer)
+                txt = f'{react.emoji} #** {react.count} **'
+
+                for attachment in message.attachments:
+                    if attachment.filename.split('.')[-1].lower() in (
+                            'jpg',
+                            'jpeg',
+                            'png',
+                            'webp',
+                            'gif',
+                            'mp4',
+                    ):
+                        embed.set_image(url=attachment.url)
+
+                already_posted = False
+
+                # Allow some time between posts to prevent double posting
+                await asyncio.sleep(5)
+                async for msg in bestof_channel.history(limit=30):
+                    for s in msg.embeds:
+                        if message.jump_url in s.to_dict()['description']:
+                            prev_post = msg
+                            already_posted = True
+                if already_posted:
+                    await prev_post.edit(content=txt, embed=embed)
+                else:
+                    await bestof_channel.send(content=txt, embed=embed)
+
 
     elif (
         raw_reaction_event.emoji.name == "👎"
@@ -88,7 +136,7 @@ async def on_raw_reaction_add(raw_reaction_event):
 
 async def purge_hi_chat():
     print("purging hi chat")
-    channel: TextChannel = client.get_channel(HI_CHAT_ID)
+    channel: TextChannel = await client.fetch_channel(HI_CHAT_ID)
     messages = [m async for m in channel.history(limit=100)]
 
     for msg in messages:
