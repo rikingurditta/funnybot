@@ -47,7 +47,7 @@ async def on_message(message):
         return
 
     if (
-            message.content != "" or len(message.attachments) == 0
+        message.content != "" or len(message.attachments) == 0
     ) and message.channel.name == IMAGES_CHANNEL_NAME:
         print(f"deleting non only image in #{IMAGES_CHANNEL_NAME}")
         print(message.channel.name)
@@ -82,10 +82,10 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
                 print(f"starring {STAR_THRESHOLD}x⭐")
                 bestof_channel: TextChannel = client.get_channel(BESTOF_CHANNEL_ID)
                 if bestof_channel is None:
-                    bestof_channel: TextChannel = await client.fetch_channel(BESTOF_CHANNEL_ID)
-                bestof_msg = (
-                    f'{message.content}\n\n[Click Here to view context]({message.jump_url})'
-                )
+                    bestof_channel: TextChannel = await client.fetch_channel(
+                        BESTOF_CHANNEL_ID
+                    )
+                bestof_msg = f"{message.content}\n\n[Click Here to view context]({message.jump_url})"
                 # fetch member instead of user to get the top role color
                 author_member = await message.guild.fetch_member(message.author.id)
                 embed = Embed(
@@ -98,18 +98,18 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
                     name=message.author.display_name, icon_url=message.author.avatar
                 )
 
-                footer = f'{message.guild.name} | #{message.channel.name}'
+                footer = f"{message.guild.name} | #{message.channel.name}"
                 embed.set_footer(text=footer)
-                txt = f'{react.emoji} #** {react.count} **'
+                txt = f"{react.emoji} #** {react.count} **"
 
                 for attachment in message.attachments:
-                    if attachment.filename.split('.')[-1].lower() in (
-                            'jpg',
-                            'jpeg',
-                            'png',
-                            'webp',
-                            'gif',
-                            'mp4',
+                    if attachment.filename.split(".")[-1].lower() in (
+                        "jpg",
+                        "jpeg",
+                        "png",
+                        "webp",
+                        "gif",
+                        "mp4",
                     ):
                         embed.set_image(url=attachment.url)
 
@@ -119,7 +119,7 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
                 await asyncio.sleep(5)
                 async for msg in bestof_channel.history(limit=30):
                     for s in msg.embeds:
-                        if message.jump_url in s.to_dict()['description']:
+                        if message.jump_url in s.to_dict()["description"]:
                             prev_post = msg
                             already_posted = True
                 if already_posted:
@@ -127,11 +127,7 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
                 else:
                     await bestof_channel.send(content=txt, embed=embed)
 
-
-    elif (
-            payload.emoji.name == "👎"
-            and message.channel.name == IMAGES_CHANNEL_NAME
-    ):
+    elif payload.emoji.name == "👎" and message.channel.name == IMAGES_CHANNEL_NAME:
         for react in reactions:
             if react.emoji == "👎" and react.count >= DEL_THRESHOLD:
                 print(f"deleting {DEL_THRESHOLD}x👎")
@@ -156,7 +152,7 @@ async def purge_hi_chat():
             )
         )
         if msg.created_at.astimezone(pytz.utc) < tz.normalize(
-                datetime.datetime.now(tz)
+            datetime.datetime.now(tz)
         ).astimezone(pytz.utc) - datetime.timedelta(minutes=15):
             print(f"deleting {msg.id} through 15 min loop")
             await msg.delete()
