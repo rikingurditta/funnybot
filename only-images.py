@@ -6,7 +6,7 @@ import os
 import sys
 import datetime
 from discord.ext import tasks
-from discord import TextChannel, RawReactionActionEvent, Embed, Message
+from discord import TextChannel, RawReactionActionEvent, Embed, Message, Reaction
 import pytz
 
 STAR_THRESHOLD = 5
@@ -47,7 +47,7 @@ async def on_message(message):
         return
 
     if (
-        message.content != "" or len(message.attachments) == 0
+            message.content != "" or len(message.attachments) == 0
     ) and message.channel.name == IMAGES_CHANNEL_NAME:
         print(f"deleting non only image in #{IMAGES_CHANNEL_NAME}")
         print(message.channel.name)
@@ -64,24 +64,29 @@ async def get_message_by_id(guild_id, channel_id, message_id):
 
 
 @client.event
-async def on_raw_reaction_add(raw_reaction_event: RawReactionActionEvent):
-    message: Message = await get_message_by_id(
-        raw_reaction_event.guild_id,
-        raw_reaction_event.channel_id,
-        raw_reaction_event.message_id,
-    )
+async def on_raw_reaction_add(payload: RawReactionActionEvent):
+    # we do this to limit the amount of API calls we make
+    channel: TextChannel = client.get_channel(payload.channel_id)
+    if channel is None:
+        channel: TextChannel = await client.fetch_channel(payload.channel_id)
+    message: Message = await channel.fetch_message(payload.message_id)
     reactions = message.reactions
+    print("reaction {}".format(payload.emoji.name))
 
-    print("reaction {}".format(raw_reaction_event.emoji.name))
-
-    if raw_reaction_event.emoji.name == "⭐":
+    if payload.emoji.name == "⭐":
         for react in reactions:
             if react.emoji == "⭐" and react.count >= STAR_THRESHOLD:
+                if payload.channel_id == HI_CHAT_ID:
+                    await message.pin()
+                    return
                 print(f"starring {STAR_THRESHOLD}x⭐")
-                bestof_channel = await client.fetch_channel(BESTOF_CHANNEL_ID)
+                bestof_channel: TextChannel = client.get_channel(BESTOF_CHANNEL_ID)
+                if bestof_channel is None:
+                    bestof_channel: TextChannel = await client.fetch_channel(BESTOF_CHANNEL_ID)
                 bestof_msg = (
-                        f'{message.content}\n\n[Click Here to view context]({message.jump_url})'
-                    )
+                    f'{message.content}\n\n[Click Here to view context]({message.jump_url})'
+                )
+                # fetch member instead of user to get the top role color
                 author_member = await message.guild.fetch_member(message.author.id)
                 embed = Embed(
                     color=author_member.top_role.color,
@@ -124,8 +129,8 @@ async def on_raw_reaction_add(raw_reaction_event: RawReactionActionEvent):
 
 
     elif (
-        raw_reaction_event.emoji.name == "👎"
-        and message.channel.name == IMAGES_CHANNEL_NAME
+            payload.emoji.name == "👎"
+            and message.channel.name == IMAGES_CHANNEL_NAME
     ):
         for react in reactions:
             if react.emoji == "👎" and react.count >= DEL_THRESHOLD:
@@ -136,7 +141,9 @@ async def on_raw_reaction_add(raw_reaction_event: RawReactionActionEvent):
 
 async def purge_hi_chat():
     print("purging hi chat")
-    channel: TextChannel = await client.fetch_channel(HI_CHAT_ID)
+    channel: TextChannel = client.get_channel(HI_CHAT_ID)
+    if channel is None:
+        channel: TextChannel = await client.fetch_channel(HI_CHAT_ID)
     messages = [m async for m in channel.history(limit=100)]
 
     for msg in messages:
@@ -149,7 +156,7 @@ async def purge_hi_chat():
             )
         )
         if msg.created_at.astimezone(pytz.utc) < tz.normalize(
-            datetime.datetime.now(tz)
+                datetime.datetime.now(tz)
         ).astimezone(pytz.utc) - datetime.timedelta(minutes=15):
             print(f"deleting {msg.id} through 15 min loop")
             await msg.delete()
