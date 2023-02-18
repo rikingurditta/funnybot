@@ -53,6 +53,9 @@ async def on_message(message):
         print(message.channel.name)
         await message.delete()
 
+    if "\U0001F577" in message.content.lower():
+        await message.reply("\U0001F578 SOME HUMAN", mention_author=True)
+
 
 async def get_message_by_id(guild_id, channel_id, message_id):
     guild = await client.fetch_guild(guild_id)
