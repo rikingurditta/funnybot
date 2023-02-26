@@ -76,7 +76,7 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
     reactions = message.reactions
     print("reaction {}".format(payload.emoji.name))
 
-    if payload.emoji.name == "⭐":
+    if payload.emoji.name == "⭐" and payload.channel_id != BESTOF_CHANNEL_ID:
         for react in reactions:
             if react.emoji == "⭐" and react.count >= STAR_THRESHOLD:
                 if payload.channel_id == HI_CHAT_ID:
@@ -120,7 +120,7 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
 
                 # Allow some time between posts to prevent double posting
                 await asyncio.sleep(5)
-                async for msg in bestof_channel.history(limit=30):
+                async for msg in bestof_channel.history(limit=40):
                     for s in msg.embeds:
                         if message.jump_url in s.to_dict()["description"]:
                             prev_post = msg
