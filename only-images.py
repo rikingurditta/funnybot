@@ -173,7 +173,7 @@ async def purge_hi_chat_loop():
 @tasks.loop(hours=24)
 async def post_daily_plot():
     await make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
-    GENERAL_CHANNEL_ID.send(file=discord.File("dailygraph.png"))
+    await GENERAL_CHANNEL_ID.send(file=discord.File("dailygraph.png"))
 
 
 client.run(os.environ["DISCORD_TOKEN"])
