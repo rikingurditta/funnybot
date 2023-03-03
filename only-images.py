@@ -176,7 +176,4 @@ async def post_daily_plot():
     GENERAL_CHANNEL_ID.send(file=discord.File("dailygraph.png"))
 
 
-post_daily_plot.start()
-
-
 client.run(os.environ["DISCORD_TOKEN"])
