@@ -9,9 +9,12 @@ from discord.ext import tasks
 from discord import TextChannel, RawReactionActionEvent, Embed, Message, Reaction
 import pytz
 
+from oi_daily_plot_functions import make_daily_graph
+
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
 IMAGES_CHANNEL_NAME = "images"
+GENERAL_CHANNEL_ID = 1032482385205415947
 HI_CHAT_ID = 1032482927394693178
 BESTOF_CHANNEL_ID = 1075618133571809281
 tz = pytz.timezone("Canada/Eastern")
@@ -165,6 +168,15 @@ async def purge_hi_chat():
 @tasks.loop(minutes=15)
 async def purge_hi_chat_loop():
     await purge_hi_chat()
+
+
+@tasks.loop(hours=24)
+async def post_daily_plot():
+    make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
+    await GENERAL_CHANNEL_ID.send(file=discord.File("dailygraph.png"))
+
+
+post_daily_plot.start()
 
 
 client.run(os.environ["DISCORD_TOKEN"])
