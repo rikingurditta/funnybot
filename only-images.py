@@ -6,7 +6,15 @@ import os
 import sys
 import datetime
 from discord.ext import tasks
-from discord import TextChannel, RawReactionActionEvent, Embed, Message, Reaction
+from discord import (
+    TextChannel,
+    RawReactionActionEvent,
+    Embed,
+    Message,
+    Reaction,
+    app_commands,
+    Interaction,
+)
 import pytz
 
 from oi_daily_plot_functions import make_daily_graph
@@ -14,9 +22,12 @@ from oi_daily_plot_functions import make_daily_graph
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
 IMAGES_CHANNEL_NAME = "images"
+
+OI_GUILD_ID = 961028480189992970
 GENERAL_CHANNEL_ID = 1032482385205415947
 HI_CHAT_ID = 1032482927394693178
 BESTOF_CHANNEL_ID = 1075618133571809281
+OI_DEV_ROLE_ID = 1081679547302420541
 tz = pytz.timezone("Canada/Eastern")
 
 try:
@@ -29,11 +40,13 @@ intents = discord.Intents(
     messages=True, reactions=True, guilds=True, message_content=True
 )
 client = discord.Client(intents=intents)
+tree = app_commands.CommandTree(client)
 
 
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
+    await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
     purge_hi_chat_loop.start()
 
 
@@ -177,6 +190,18 @@ async def post_daily_plot():
     if channel is None:
         channel: TextChannel = await client.fetch_channel(GENERAL_CHANNEL_ID)
     await channel.send(file=discord.File("dailygraph.png"))
+
+
+@tree.command(
+    name="forceplot",
+    description="Force rose's daily plot to be posted",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+@app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+async def force_run_daily_plot(interaction: Interaction):
+    await interaction.response.defer()
+    make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
+    await interaction.followup.send(file=discord.File("dailygraph.png"))
 
 
 client.run(os.environ["DISCORD_TOKEN"])
