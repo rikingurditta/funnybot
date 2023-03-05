@@ -2,6 +2,7 @@ import numpy as np
 import numpy.random as rd
 import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('Agg') 
 
 from math import floor
 
