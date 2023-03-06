@@ -16,6 +16,7 @@ from discord import (
     Interaction,
 )
 import pytz
+import sqlite3
 
 from oi_daily_plot_functions import make_daily_graph
 
@@ -28,7 +29,27 @@ GENERAL_CHANNEL_ID = 1032482385205415947
 HI_CHAT_ID = 1032482927394693178
 BESTOF_CHANNEL_ID = 1075618133571809281
 OI_DEV_ROLE_ID = 1081679547302420541
+
 tz = pytz.timezone("Canada/Eastern")
+
+connection = sqlite3.connect("oi.db")
+cursor = connection.cursor()
+cursor.execute("CREATE TABLE IF NOT EXISTS schema_version (version INT NOT NULL)")
+db_version = cursor.execute("SELECT version FROM schema_version").fetchall()
+if len(db_version) == 0:
+    db_version = 0
+else:
+    db_version = db_version[0][0]
+if db_version < 1:
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS oi (id TEXT NOT NULL, messagecount INT NOT NULL)"
+    )
+LATEST_VERSION = 1
+if db_version == 0:
+    cursor.execute("INSERT INTO schema_version VALUES (1)")
+else:
+    cursor.execute("UPDATE schema_version SET version = ?", (LATEST_VERSION,))
+connection.commit()
 
 try:
     os.environ["DISCORD_TOKEN"]
@@ -41,6 +62,17 @@ intents = discord.Intents(
 )
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
+
+
+def update_message_count(id):
+    cursor.execute("SELECT * FROM oi WHERE id = ?", (id,))
+    if len(cursor.fetchall()) == 0:
+        cursor.execute("INSERT INTO oi VALUES (?, 1)", (id,))
+    else:
+        cursor.execute(
+            "UPDATE oi SET messagecount = messagecount + 1 WHERE id = ?", (id,)
+        )
+    connection.commit()
 
 
 @client.event
@@ -56,6 +88,7 @@ async def on_message(message):
         await message.add_reaction("<:lfg:961074481219117126>")
 
     if message.channel.id == HI_CHAT_ID:
+        update_message_count(message.author.id)
         print(f"deleting {message.id} in 15 minutes")
         await message.delete(delay=900)
 
