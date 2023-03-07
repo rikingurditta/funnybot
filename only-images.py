@@ -256,7 +256,11 @@ async def hi_leaderboard(interaction: Interaction):
     for row in table:
         leaderboard += f"#{i}: <@!{row[0]}> - {row[1]} messages\n"
         i += 1
-    embed = discord.Embed(title="hi chat leaderboard", description="y'all should touch some grass", color=0xffdd00)
+    embed = discord.Embed(
+        title="hi chat leaderboard",
+        description="y'all should touch some grass",
+        color=0xFFDD00,
+    )
     embed.add_field(name="Leaderboard", value=leaderboard, inline=False)
     await interaction.followup.send(embed=embed)
 
