@@ -75,6 +75,11 @@ def update_message_count(id):
     connection.commit()
 
 
+def get_hi_leaderboard():
+    cursor.execute("SELECT * FROM oi ORDER BY messagecount DESC")
+    return cursor.fetchall()
+
+
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
@@ -235,6 +240,42 @@ async def force_run_daily_plot(interaction: Interaction):
     await interaction.response.defer()
     make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
     await interaction.followup.send(file=discord.File("dailygraph.png"))
+
+
+@tree.command(
+    name="hileaderboard",
+    description="leaderboard for messages in #hi chat",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+@app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+@app_commands.checks.cooldown(1, 5.0, key=lambda i: (i.guild_id, i.user.id))
+async def hi_leaderboard(interaction: Interaction):
+    await interaction.response.defer()
+    table = get_hi_leaderboard()
+    i = 1
+    leaderboard = ""
+    for row in table:
+        username = client.get_user(row[0])
+        if username is None:
+            await client.fetch_user(row[0])
+        username = username.name
+        leaderboard += f"#{i}: {username} - {row[1]} messages\n"
+        i += 1
+    ret_embed = discord.Embed.from_dict(
+        {
+            "title": "Hi Chat Leaderboard",
+            "fields": [{"name": "Leaderboard", "value": leaderboard}],
+        }
+    )
+    await interaction.followup.send(embed=ret_embed)
+
+
+@hi_leaderboard.error
+async def on_hi_leaderboard_error(
+    interaction: discord.Interaction, error: app_commands.AppCommandError
+):
+    if isinstance(error, app_commands.CommandOnCooldown):
+        await interaction.response.send_message(str(error), ephemeral=True)
 
 
 client.run(os.environ["DISCORD_TOKEN"])
