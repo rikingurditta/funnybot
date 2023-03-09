@@ -12,9 +12,7 @@ dataset_names = [
     "introversion",
     "parenting",
     "animals",
-    "theft",
     "age",
-    "thinking",
     "emotions",
     "sleep",
 ]
@@ -26,7 +24,6 @@ possible_datasets = {
     "parenting": ["Would kill their child", "Great parent"],
     "animals": ["Reminiscent of a raccoon", "Reminiscent of a hamster"],
     "age": ["Young at heart", "Old soul"],
-    "thinking": ["Underthinks", "Overthinks"],
     "emotions": ["Emotionless", "Has emotions"]
 }
 
@@ -230,10 +227,10 @@ def compute_locs(bias_filename, dataset, names, answers):
             dtype=str,
             delimiter="\t",
             skip_header=1,
-            usecols=range(0, 16),
+            usecols=range(0, 8),
         )
     )
-    names, B1, B2, B3, B4, B5, B6, B7, B8, B9 = bias_info
+    names, B1, B2, B3, B4, B5, B6, B7 = bias_info
 
     if dataset == "domsub":
         bias = B1
@@ -304,14 +301,14 @@ def compute_locs(bias_filename, dataset, names, answers):
         }
 
     elif dataset == "introversion":
-        bias = B5
+        bias = B3
         bias_weight = 0.7
         rel_Qs = ["Q2", "Q17"]
         Q_biases = {"Q2": [1, 0, 0.5, 0.5, 0, 1], "Q17": [1, 0.75, 0.5, 0.25, 0]}
         Q_rel_weights = {"Q2": 0.1, "Q17": 0.9}
 
     elif dataset == "parenting":
-        bias = B9
+        bias = B4
         bias_weight = 0.7
         rel_Qs = ["Q1", "Q4", "Q9", "Q13", "Q23", "Q24"]
         Q_biases = {
@@ -332,14 +329,14 @@ def compute_locs(bias_filename, dataset, names, answers):
         }
 
     elif dataset == "animals":
-        bias = B10
+        bias = B5
         bias_weight = 0.6
         rel_Qs = ["Q20"]
         Q_biases = {"Q20": [1, 0.75, 0.5, 0.25, 0]}
         Q_rel_weights = {"Q20": 1}
 
     elif dataset == "age":
-        bias = B12
+        bias = B6
         bias_weight = 0.9
         rel_Qs = ["Q2", "Q4", "Q9", "Q17", "Q22"]
         Q_biases = {
@@ -351,15 +348,8 @@ def compute_locs(bias_filename, dataset, names, answers):
         }
         Q_rel_weights = {"Q2": 0.2, "Q4": 0.2, "Q9": 0.1, "Q17": 0.2, "Q22": 0.3}
 
-    elif dataset == "thinking":
-        bias = B13
-        bias_weight = 0.7
-        rel_Qs = ["Q23", "Q29"]
-        Q_biases = {"Q23": [0, 0.5, 0.75, 1], "Q29": [0, 0.5, 0.5, 1, 0]}
-        Q_rel_weights = {"Q23": 0.3, "Q29": 0.7}
-
     elif dataset == "emotions":
-        bias = B14
+        bias = B7
         bias_weight = 0.9
         rel_Qs = ["Q2", "Q10"]
         Q_biases = {"Q2": [0, 1, 0, 1, 1, 0], "Q10": [0, 1]}
