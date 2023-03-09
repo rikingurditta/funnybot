@@ -233,7 +233,7 @@ def compute_locs(bias_filename, dataset, names, answers):
             usecols=range(0, 16),
         )
     )
-    names, B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15 = bias_info
+    names, B1, B2, B3, B4, B5, B6, B7, B8, B9 = bias_info
 
     if dataset == "domsub":
         bias = B1
