@@ -14,7 +14,7 @@ from discord import (
     Message,
     Reaction,
     app_commands,
-    Interaction,
+    Interaction, Member, User
 )
 import pytz
 import sqlite3
@@ -59,7 +59,7 @@ except KeyError:
     sys.exit(1)
 
 intents = discord.Intents(
-    messages=True, reactions=True, guilds=True, message_content=True
+    messages=True, reactions=True, guilds=True, message_content=True, members=True
 )
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
@@ -252,25 +252,14 @@ async def hi_leaderboard(interaction: Interaction):
     await interaction.response.defer()
     table = get_hi_leaderboard()
     i = 1
-    leaderboard = ""
+    leaderboard = "#hi chat leaderboard\n"
     for row in table:
-        leaderboard += f"#{i}: <@!{row[0]}> - {row[1]} messages\n"
+        user: User = client.get_user(row[0])
+        if user is None:
+            user: User = await client.fetch_user(row[0])
+        leaderboard += f"#{i}: **{user.display_name}** - {row[1]} messages\n"
         i += 1
-    embed = discord.Embed(
-        title="hi chat leaderboard",
-        description="y'all should touch some grass",
-        color=0xFFDD00,
-    )
-    embed.add_field(name="Leaderboard", value=leaderboard, inline=False)
-    await interaction.followup.send(embed=embed)
-
-
-@hi_leaderboard.error
-async def on_hi_leaderboard_error(
-    interaction: discord.Interaction, error: app_commands.AppCommandError
-):
-    if isinstance(error, app_commands.CommandOnCooldown):
-        await interaction.response.send_message(str(error), ephemeral=True)
+    await interaction.followup.send(leaderboard)
 
 
 client.run(os.environ["DISCORD_TOKEN"])
