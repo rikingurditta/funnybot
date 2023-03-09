@@ -253,12 +253,18 @@ async def hi_leaderboard(interaction: Interaction):
     table = get_hi_leaderboard()
     i = 1
     leaderboard = "#hi chat leaderboard\n"
+    unknown_users = []
     for row in table:
-        user: User = client.get_user(row[0])
-        if user is None:
-            user: User = await client.fetch_user(row[0])
+        try:
+            user: User = client.get_user(row[0])
+            if user is None:
+                user: User = await client.fetch_user(row[0])
+        except:
+            unknown_users.append(row[0])
+            continue
         leaderboard += f"#{i}: **{user.display_name}** - {row[1]} messages\n"
         i += 1
+    print(unknown_users)
     await interaction.followup.send(leaderboard)
 
 
