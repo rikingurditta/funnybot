@@ -9,12 +9,7 @@ from math import floor
 dataset_names = [
     "domsub",
     "chaos",
-    "driving",
-    "bullying",
     "introversion",
-    "amongus",
-    "vibes",
-    "math",
     "parenting",
     "animals",
     "theft",
@@ -27,19 +22,12 @@ dataset_names = [
 possible_datasets = {
     "domsub": ["Sub", "Dom"],
     "chaos": ["Lawful", "Chaotic"],
-    "driving": ["Bad driver", "Good driver"],
-    "bullying": ["Bullied", "Bully"],
     "introversion": ["Extrovert", "Introvert"],
-    "amongus": ["Impostor", "Crewmate"],
-    "vibes": ["Chill", "Pretentious"],
-    "math": ["Bad at math", "Good at math"],
     "parenting": ["Would kill their child", "Great parent"],
     "animals": ["Reminiscent of a raccoon", "Reminiscent of a hamster"],
-    "theft": ["Would get burgled", "Potential burglar"],
     "age": ["Young at heart", "Old soul"],
     "thinking": ["Underthinks", "Overthinks"],
-    "emotions": ["Emotionless", "Has emotions"],
-    "sleep": ["Sleepy", "Awake"],
+    "emotions": ["Emotionless", "Has emotions"]
 }
 
 possible_answers = {
@@ -315,71 +303,12 @@ def compute_locs(bias_filename, dataset, names, answers):
             "Q29": 0.05,
         }
 
-    elif dataset == "driving":
-        bias = B3
-        bias_weight = 0.5
-        rel_Qs = ["Q4", "Q12", "Q25"]
-        Q_biases = {"Q4": [1, 0], "Q12": [0.4, 0.6], "Q25": [0, 1]}
-        Q_rel_weights = {"Q4": 0.45, "Q12": 0.05, "Q25": 0.5}
-
-    elif dataset == "bullying":
-        bias = B4
-        bias_weight = 0.9
-        rel_Qs = ["Q2", "Q5", "Q6", "Q10", "Q13", "Q19"]
-        Q_biases = {
-            "Q2": [0, 0.5, 0.5, 0.5, 1, 0],
-            "Q5": [1, 0],
-            "Q6": [0, 0.25, 0.5, 0.75, 1],
-            "Q10": [1, 0],
-            "Q13": [0, 0.25, 0.5, 0.75, 1],
-            "Q19": [0.8, 1, 0, 0.5, 0.5],
-        }
-        Q_rel_weights = {
-            "Q2": 0.3,
-            "Q5": 0.05,
-            "Q6": 0.2,
-            "Q10": 0.05,
-            "Q13": 0.2,
-            "Q19": 0.2,
-        }
-
     elif dataset == "introversion":
         bias = B5
         bias_weight = 0.7
         rel_Qs = ["Q2", "Q17"]
         Q_biases = {"Q2": [1, 0, 0.5, 0.5, 0, 1], "Q17": [1, 0.75, 0.5, 0.25, 0]}
         Q_rel_weights = {"Q2": 0.1, "Q17": 0.9}
-
-    elif dataset == "amongus":
-        bias = B6
-        bias_weight = 0.7
-        rel_Qs = ["Q8", "Q11", "Q19"]
-        Q_biases = {
-            "Q8": [0, 1, 0],
-            "Q11": [0, 1, 1, 1, 1, 1, 1],
-            "Q19": [1, 1, 1, 1, 0],
-        }
-        Q_rel_weights = {"Q8": 0.1, "Q11": 0.4, "Q19": 0.5}
-
-    elif dataset == "vibes":
-        bias = B7
-        bias_weight = 0.7
-        rel_Qs = ["Q2", "Q3", "Q5", "Q19", "Q28"]
-        Q_biases = {
-            "Q2": [0, 1, 0, 1, 0, 0],
-            "Q3": [0.25, 0.5, 0.75, 1, 0],
-            "Q5": [0, 1],
-            "Q19": [1, 0, 0.5, 0, 1],
-            "Q28": [1, 0],
-        }
-        Q_rel_weights = {"Q2": 0.1, "Q3": 0.2, "Q5": 0.1, "Q19": 0.2, "Q28": 0.4}
-
-    elif dataset == "math":
-        bias = B8
-        bias_weight = 0.7
-        rel_Qs = ["Q25"]
-        Q_biases = {"Q25": [0, 1]}
-        Q_rel_weights = {"Q25": 1}
 
     elif dataset == "parenting":
         bias = B9
@@ -409,17 +338,6 @@ def compute_locs(bias_filename, dataset, names, answers):
         Q_biases = {"Q20": [1, 0.75, 0.5, 0.25, 0]}
         Q_rel_weights = {"Q20": 1}
 
-    elif dataset == "theft":
-        bias = B11
-        bias_weight = 0.4
-        rel_Qs = ["Q6", "Q8", "Q13"]
-        Q_biases = {
-            "Q6": [0, 0.25, 0.5, 0.75, 1],
-            "Q8": [0.9, 0, 1],
-            "Q13": [0, 0.25, 0.5, 0.75, 1],
-        }
-        Q_rel_weights = {"Q6": 0.2, "Q8": 0.7, "Q13": 0.1}
-
     elif dataset == "age":
         bias = B12
         bias_weight = 0.9
@@ -446,13 +364,6 @@ def compute_locs(bias_filename, dataset, names, answers):
         rel_Qs = ["Q2", "Q10"]
         Q_biases = {"Q2": [0, 1, 0, 1, 1, 0], "Q10": [0, 1]}
         Q_rel_weights = {"Q2": 0.7, "Q10": 0.3}
-
-    elif dataset == "sleep":
-        bias = B15
-        bias_weight = 0.8
-        rel_Qs = ["Q3", "Q5"]
-        Q_biases = {"Q3": [0.1, 1, 1, 1, 0], "Q5": [0.9, 0.1]}
-        Q_rel_weights = {"Q3": 0.5, "Q5": 0.5}
 
     total_q_weights = 1 - bias_weight
 
