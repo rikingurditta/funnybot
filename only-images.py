@@ -22,6 +22,8 @@ import pytz
 import sqlite3
 
 from oi_daily_plot_functions import make_daily_graph
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
@@ -88,6 +90,11 @@ async def on_ready():
     print("We have logged in as {0.user}".format(client))
     await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
     purge_hi_chat_loop.start()
+
+    # rose plot scheduler
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
+    scheduler.start()
 
 
 @client.event
@@ -224,15 +231,6 @@ async def purge_hi_chat_loop():
     await purge_hi_chat()
 
 
-@tasks.loop(hours=24)
-async def post_daily_plot():
-    make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
-    channel: TextChannel = client.get_channel(GENERAL_CHANNEL_ID)
-    if channel is None:
-        channel: TextChannel = await client.fetch_channel(GENERAL_CHANNEL_ID)
-    await channel.send(file=discord.File("dailygraph.png"))
-
-
 @tree.command(
     name="forceplot",
     description="Force rose's daily plot to be posted",
@@ -268,6 +266,14 @@ async def hi_leaderboard(interaction: Interaction):
         i += 1
     print(unknown_users)
     await interaction.followup.send(leaderboard)
+
+
+async def post_plot_job():
+    make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
+    channel: TextChannel = client.get_channel(GENERAL_CHANNEL_ID)
+    if channel is None:
+        channel: TextChannel = await client.fetch_channel(GENERAL_CHANNEL_ID)
+    await channel.send(file=discord.File("dailygraph.png"))
 
 
 client.run(os.environ["DISCORD_TOKEN"])
