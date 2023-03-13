@@ -1,23 +1,60 @@
 import asyncio
 from time import sleep
+import datetime
+from datetime import timezone
 
 import discord
 import os
 import sys
-import datetime
 from discord.ext import tasks
-from discord import TextChannel, RawReactionActionEvent, Embed, Message, Reaction
+from discord import (
+    TextChannel,
+    RawReactionActionEvent,
+    Embed,
+    Message,
+    Reaction,
+    app_commands,
+    Interaction,
+    Member,
+    User,
+)
 import pytz
+import sqlite3
 
 from oi_daily_plot_functions import make_daily_graph
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
 IMAGES_CHANNEL_NAME = "images"
+
+OI_GUILD_ID = 961028480189992970
 GENERAL_CHANNEL_ID = 1032482385205415947
 HI_CHAT_ID = 1032482927394693178
 BESTOF_CHANNEL_ID = 1075618133571809281
+OI_DEV_ROLE_ID = 1081679547302420541
+
 tz = pytz.timezone("Canada/Eastern")
+
+connection = sqlite3.connect("oi.db")
+cursor = connection.cursor()
+cursor.execute("CREATE TABLE IF NOT EXISTS schema_version (version INT NOT NULL)")
+db_version = cursor.execute("SELECT version FROM schema_version").fetchall()
+if len(db_version) == 0:
+    db_version = 0
+else:
+    db_version = db_version[0][0]
+if db_version < 1:
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS oi (id TEXT NOT NULL, messagecount INT NOT NULL)"
+    )
+LATEST_VERSION = 1
+if db_version == 0:
+    cursor.execute("INSERT INTO schema_version VALUES (1)")
+else:
+    cursor.execute("UPDATE schema_version SET version = ?", (LATEST_VERSION,))
+connection.commit()
 
 try:
     os.environ["DISCORD_TOKEN"]
@@ -26,15 +63,38 @@ except KeyError:
     sys.exit(1)
 
 intents = discord.Intents(
-    messages=True, reactions=True, guilds=True, message_content=True
+    messages=True, reactions=True, guilds=True, message_content=True, members=True
 )
 client = discord.Client(intents=intents)
+tree = app_commands.CommandTree(client)
+
+
+def update_message_count(id):
+    cursor.execute("SELECT * FROM oi WHERE id = ?", (id,))
+    if len(cursor.fetchall()) == 0:
+        cursor.execute("INSERT INTO oi VALUES (?, 1)", (id,))
+    else:
+        cursor.execute(
+            "UPDATE oi SET messagecount = messagecount + 1 WHERE id = ?", (id,)
+        )
+    connection.commit()
+
+
+def get_hi_leaderboard():
+    cursor.execute("SELECT * FROM oi ORDER BY messagecount DESC")
+    return cursor.fetchall()
 
 
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
+    await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
     purge_hi_chat_loop.start()
+
+    # rose plot scheduler
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
+    scheduler.start()
 
 
 @client.event
@@ -43,6 +103,7 @@ async def on_message(message):
         await message.add_reaction("<:lfg:961074481219117126>")
 
     if message.channel.id == HI_CHAT_ID:
+        update_message_count(message.author.id)
         print(f"deleting {message.id} in 15 minutes")
         await message.delete(delay=900)
 
@@ -170,12 +231,54 @@ async def purge_hi_chat_loop():
     await purge_hi_chat()
 
 
+<<<<<<< HEAD
 @tasks.loop(hours=24)
 async def post_daily_plot():
     await make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
 <<<<<<< HEAD
     await GENERAL_CHANNEL_ID.send(file=discord.File("dailygraph.png"))
 =======
+=======
+@tree.command(
+    name="forceplot",
+    description="Force rose's daily plot to be posted",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+@app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+async def force_run_daily_plot(interaction: Interaction):
+    await interaction.response.defer()
+    make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
+    await interaction.followup.send(file=discord.File("dailygraph.png"))
+
+
+@tree.command(
+    name="hileaderboard",
+    description="leaderboard for messages in #hi chat",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+async def hi_leaderboard(interaction: Interaction):
+    await interaction.response.defer()
+    table = get_hi_leaderboard()
+    i = 1
+    leaderboard = "#hi chat leaderboard\n"
+    unknown_users = []
+    for row in table:
+        try:
+            user: User = client.get_user(row[0])
+            if user is None:
+                user: User = await client.fetch_user(row[0])
+        except:
+            unknown_users.append(row[0])
+            continue
+        leaderboard += f"#{i}: **{user.display_name}** - {row[1]} messages\n"
+        i += 1
+    print(unknown_users)
+    await interaction.followup.send(leaderboard)
+
+
+async def post_plot_job():
+    make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
+>>>>>>> ef4cbb5b7e6ee00c8863a9e9e70844ae8bac46b1
     channel: TextChannel = client.get_channel(GENERAL_CHANNEL_ID)
     if channel is None:
         channel: TextChannel = await client.fetch_channel(GENERAL_CHANNEL_ID)
