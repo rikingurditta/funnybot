@@ -2,7 +2,8 @@ import numpy as np
 import numpy.random as rd
 import matplotlib
 import matplotlib.pyplot as plt
-matplotlib.use('Agg') 
+
+matplotlib.use("Agg")
 
 from math import floor
 
@@ -25,7 +26,7 @@ dataset_names = [
     "body",
     "attraction",
     "afterlife",
-    "drinks"
+    "drinks",
 ]
 
 possible_datasets = {
@@ -38,7 +39,7 @@ possible_datasets = {
     "swimming": ["Drowning", "Could be a lifeguard"],
     "temper": ["Short-tempered", "Patient"],
     "bird": ["Early bird", "Night owl"],
-    "wokeness": ["Raciest", "Woke"], 
+    "wokeness": ["Raciest", "Woke"],
     "movie": ["Dies first in horror movie", "Last one standing"],
     "type": ["Type A", "Type B"],
     "shape": ["Kiki", "Bouba"],
@@ -47,7 +48,7 @@ possible_datasets = {
     "body": ["Helps you bury a body", "Rats you out"],
     "attraction": ["Boobs", "Ass"],
     "afterlife": ["Hellbound", "Heavenbound"],
-    "drinks": ["Tea", "Coffee"]
+    "drinks": ["Tea", "Coffee"],
 }
 
 possible_answers = {
@@ -58,59 +59,159 @@ possible_answers = {
         "Swamp",
         "Garbage",
         "Toilet",
-        ""
+        "",
     ],
     "Q3": ["Yes", "No", "I've stolen, but not from a store", ""],
     "Q4": ["Gay or bi", "Other", ""],
-    "Q5": ["Aries (Mar 21 - Apr 19)", "Taurus (Apr 20 - May 20)", "Gemini (May 21 - Jun 20)", "Cancer (Jun 21 - Jul 22)",
-           "Leo (Jul 23 - Aug 22)", "Virgo (Aug 23 - Sep 22)", "Libra (Sep 23 - Oct 22)", "Scorpio (Oct 23 - Nov 21)", 
-           "Sagittarius (Nov 22 - Dec 21)", "Capricorn (Dec 22 - Jan 19)", "Aquarius (Jan 20 - Feb 18)", "Pisces (Feb 19 - Mar 20)", ""],
-    "Q6": ["Berries", "Torus", "Gemstone", "Carcinoma", "Leg", "Virgin", "Libel", "Scrungle", "Sadge", "Cornchip", "Asparagus", "Piss", ""],
+    "Q5": [
+        "Aries (Mar 21 - Apr 19)",
+        "Taurus (Apr 20 - May 20)",
+        "Gemini (May 21 - Jun 20)",
+        "Cancer (Jun 21 - Jul 22)",
+        "Leo (Jul 23 - Aug 22)",
+        "Virgo (Aug 23 - Sep 22)",
+        "Libra (Sep 23 - Oct 22)",
+        "Scorpio (Oct 23 - Nov 21)",
+        "Sagittarius (Nov 22 - Dec 21)",
+        "Capricorn (Dec 22 - Jan 19)",
+        "Aquarius (Jan 20 - Feb 18)",
+        "Pisces (Feb 19 - Mar 20)",
+        "",
+    ],
+    "Q6": [
+        "Berries",
+        "Torus",
+        "Gemstone",
+        "Carcinoma",
+        "Leg",
+        "Virgin",
+        "Libel",
+        "Scrungle",
+        "Sadge",
+        "Cornchip",
+        "Asparagus",
+        "Piss",
+        "",
+    ],
     "Q7": ["Gay son", "Thot daughter", ""],
-    "Q8": ["The oldest child", "The middle child/one of the middle childs", "The youngest child", "I don't have siblings", ""],
-    "Q9": ["Today", "This week", "Within the past month", "Over a month ago/don't remember", ""],
-    "Q10": ["A sentient vending machine", "A seven foot tall kindergartener", "I would not be able to take either of these", ""],
+    "Q8": [
+        "The oldest child",
+        "The middle child/one of the middle childs",
+        "The youngest child",
+        "I don't have siblings",
+        "",
+    ],
+    "Q9": [
+        "Today",
+        "This week",
+        "Within the past month",
+        "Over a month ago/don't remember",
+        "",
+    ],
+    "Q10": [
+        "A sentient vending machine",
+        "A seven foot tall kindergartener",
+        "I would not be able to take either of these",
+        "",
+    ],
     "Q11": ["Zayn", "Louis", "Harry", "Niall", "The other one", ""],
-    "Q12": ["Be stabbed in the stomach", "Gnaw off your own leg to escape", "Be burned grievously",
-            "Be left alone with your own thoughts for 5 hours", ""],
+    "Q12": [
+        "Be stabbed in the stomach",
+        "Gnaw off your own leg to escape",
+        "Be burned grievously",
+        "Be left alone with your own thoughts for 5 hours",
+        "",
+    ],
     "Q13": ["None", "1 - 3", "4 - 7", "7 - 9", "10+", ""],
     "Q14": ["Just woke up", "Are still awake from the day before", ""],
-    "Q15": ["Leave it alone and hope it goes away", "Trap it and bring it outside",
-            "Run away and cede the location", "Squash it", "Kiss it", ""],
+    "Q15": [
+        "Leave it alone and hope it goes away",
+        "Trap it and bring it outside",
+        "Run away and cede the location",
+        "Squash it",
+        "Kiss it",
+        "",
+    ],
     "Q16": ["Tim's", "Starbucks", ""],
-    "Q17": ["A french press", "A children's dollhouse", "A coffee table", "A bookshelf", "A wardrobe", "A bed", ""],
+    "Q17": [
+        "A french press",
+        "A children's dollhouse",
+        "A coffee table",
+        "A bookshelf",
+        "A wardrobe",
+        "A bed",
+        "",
+    ],
     "Q18": ["Reserved", "Outgoing", ""],
-    "Q19": ["Not hungry - you want to get ahead of the hunger",
-            "A little hungry",
-            "Very hungry",
-            "So hungry you're about to pass out",
-            ""],
-    "Q20": ["Stress ball", "Toothbrush", "Lamp", "Hardcover book", "Rolling pin", "Frying pan", "Kitchen knife", ""],
+    "Q19": [
+        "Not hungry - you want to get ahead of the hunger",
+        "A little hungry",
+        "Very hungry",
+        "So hungry you're about to pass out",
+        "",
+    ],
+    "Q20": [
+        "Stress ball",
+        "Toothbrush",
+        "Lamp",
+        "Hardcover book",
+        "Rolling pin",
+        "Frying pan",
+        "Kitchen knife",
+        "",
+    ],
     "Q21": ["1", "2", "3", "4", "5", ""],
     "Q22": ["Sea urchin", "Blobfish", ""],
-    "Q23": ["Very little/none", "I'll appreciate a pun if it's really clever", "Tolerance? I love puns!", ""],
-    "Q24": ["Me", "Someone else", "There's nothing to shovel (e.g. live in an apartment)", ""],
-    "Q25": ["Wade in slowly", "Jump in", "Go down a waterslide", "Dive in from the edge", "Dive in from a diving board", ""],
+    "Q23": [
+        "Very little/none",
+        "I'll appreciate a pun if it's really clever",
+        "Tolerance? I love puns!",
+        "",
+    ],
+    "Q24": [
+        "Me",
+        "Someone else",
+        "There's nothing to shovel (e.g. live in an apartment)",
+        "",
+    ],
+    "Q25": [
+        "Wade in slowly",
+        "Jump in",
+        "Go down a waterslide",
+        "Dive in from the edge",
+        "Dive in from a diving board",
+        "",
+    ],
     "Q26": ["Lola Bunny", "Jessica Rabbit", ""],
     "Q27": ["Book smart", "Street smart", ""],
-    "Q28": ["Under a minute", "A couple minutes", "Quite a while", "I don't think I could do it", ""],
-    "Q29": ["When someone starts something and then doesnt fini", 
-            "When someone touches you without warning",
-            "When someone is late",
-            "When someone is mad at you for being late",
-            "When someone is being stupid",
-            "When you have to wait",
-            ""],
-    "Q30": ["As a baby",
-            "As a young child",
-            "Elementary school",
-            "Middle-high school",
-            "University",
-            "After university",
-            "Still waiting",
-            ""],
+    "Q28": [
+        "Under a minute",
+        "A couple minutes",
+        "Quite a while",
+        "I don't think I could do it",
+        "",
+    ],
+    "Q29": [
+        "When someone starts something and then doesnt fini",
+        "When someone touches you without warning",
+        "When someone is late",
+        "When someone is mad at you for being late",
+        "When someone is being stupid",
+        "When you have to wait",
+        "",
+    ],
+    "Q30": [
+        "As a baby",
+        "As a young child",
+        "Elementary school",
+        "Middle-high school",
+        "University",
+        "After university",
+        "Still waiting",
+        "",
+    ],
     "Q31": ["1", "2", "3", "4", "5", ""],
-    "Q32": ["Yes", "No", ""]
+    "Q32": ["Yes", "No", ""],
 }
 
 
@@ -154,7 +255,7 @@ def parse_csv(filename):
         Q29,
         Q30,
         Q31,
-        Q32
+        Q32,
     ) = text
     answers = {
         "Q1": Q1,
@@ -165,7 +266,7 @@ def parse_csv(filename):
         "Q6": Q6,
         "Q7": Q7,
         "Q8": Q8,
-        "Q9": Q9, 
+        "Q9": Q9,
         "Q10": Q10,
         "Q11": Q11,
         "Q12": Q12,
@@ -179,7 +280,7 @@ def parse_csv(filename):
         "Q20": Q20,
         "Q21": Q21,
         "Q22": Q22,
-        "Q23": Q23, 
+        "Q23": Q23,
         "Q24": Q24,
         "Q25": Q25,
         "Q26": Q26,
@@ -188,8 +289,8 @@ def parse_csv(filename):
         "Q29": Q29,
         "Q30": Q30,
         "Q31": Q31,
-        "Q32": Q32
-        }
+        "Q32": Q32,
+    }
 
     colours = []
 
@@ -250,7 +351,28 @@ def compute_locs(bias_filename, dataset, names, answers):
             usecols=range(0, 20),
         )
     )
-    names, B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, B17, B18, B19 = bias_info
+    (
+        names,
+        B1,
+        B2,
+        B3,
+        B4,
+        B5,
+        B6,
+        B7,
+        B8,
+        B9,
+        B10,
+        B11,
+        B12,
+        B13,
+        B14,
+        B15,
+        B16,
+        B17,
+        B18,
+        B19,
+    ) = bias_info
 
     if dataset == "animals":
         bias = B1
@@ -258,7 +380,7 @@ def compute_locs(bias_filename, dataset, names, answers):
         rel_Qs = ["Q2"]
         Q_biases = {"Q2": [1, 0.75, 0.5, 0.25, 0, 0.5]}
         Q_rel_weights = {"Q2": 1}
-        
+
     elif dataset == "nails":
         bias = B2
         bias_weight = 0.7
@@ -279,56 +401,56 @@ def compute_locs(bias_filename, dataset, names, answers):
         rel_Qs = ["Q8", "Q19"]
         Q_biases = {"Q8": [1, 1, 0, 0.5, 0.5], "Q19": [0.9, 1, 0.1, 0, 0.5]}
         Q_rel_weights = {"Q8": 0.8, "Q19": 0.2}
-        
+
     elif dataset == "pets":
         bias = B5
         bias_weight = 0.8
         rel_Qs = ["Q7", "Q18"]
         Q_biases = {"Q7": [0, 1, 0.5], "Q18": [0, 1, 0.5]}
         Q_rel_weights = {"Q7": 0.2, "Q18": 0.8}
-        
+
     elif dataset == "division":
         bias = B6
         bias_weight = 0.65
         rel_Qs = ["Q4", "Q32"]
         Q_biases = {"Q4": [0, 1, 0.5], "Q32": [1, 0, 0.5]}
         Q_rel_weights = {"Q4": 0.2, "Q32": 0.8}
-        
+
     elif dataset == "swimming":
         bias = B7
         bias_weight = 0.6
         rel_Qs = ["Q25"]
         Q_biases = {"Q25": [0, 0.25, 0.5, 0.75, 1, 0.5]}
         Q_rel_weights = {"Q25": 1}
-        
+
     elif dataset == "temper":
         bias = B8
         bias_weight = 0.8
         rel_Qs = ["Q9", "Q23"]
         Q_biases = {"Q9": [0, 0.3, 0.7, 1, 0.5], "Q23": [0, 0.5, 1, 0.5]}
         Q_rel_weights = {"Q9": 0.7, "Q23": 0.3}
-        
+
     elif dataset == "bird":
         bias = B9
         bias_weight = 0.6
         rel_Qs = ["Q14"]
         Q_biases = {"Q14": [0, 1, 0.5]}
         Q_rel_weights = {"Q14": 1}
-        
+
     elif dataset == "wokeness":
         bias = B10
         bias_weight = 0.6
         rel_Qs = ["Q13"]
         Q_biases = {"Q13": [0, 0.2, 0.3, 0.9, 1, 0.5]}
         Q_rel_weights = {"Q13": 1}
-        
+
     elif dataset == "movie":
         bias = B11
         bias_weight = 0.9
         rel_Qs = ["Q27", "Q31"]
         Q_biases = {"Q27": [0, 1, 0.5], "Q31": [0, 0.25, 0.5, 0.75, 1, 0.5]}
         Q_rel_weights = {"Q27": 0.25, "Q31": 0.75}
-        
+
     elif dataset == "type":
         bias = B12
         bias_weight = 1
@@ -342,49 +464,59 @@ def compute_locs(bias_filename, dataset, names, answers):
         rel_Qs = ["Q22"]
         Q_biases = {"Q22": [0, 1, 0.5]}
         Q_rel_weights = {"Q22": 1}
-        
+
     elif dataset == "camping":
         bias = B14
         bias_weight = 0.7
         rel_Qs = ["Q15", "Q17"]
-        Q_biases = {"Q15": [0.9, 1, 0, 0.1, 1, 0.5], "Q17": [1, 0.9, 0.8, 0.2, 0, 0.1, 0.5]}
+        Q_biases = {
+            "Q15": [0.9, 1, 0, 0.1, 1, 0.5],
+            "Q17": [1, 0.9, 0.8, 0.2, 0, 0.1, 0.5],
+        }
         Q_rel_weights = {"Q15": 0.7, "Q17": 0.3}
-        
+
     elif dataset == "chadness":
         bias = B15
         bias_weight = 0.8
         rel_Qs = ["Q6", "Q30"]
-        Q_biases = {"Q6": [1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0.5], "Q30": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 0.5]}
+        Q_biases = {
+            "Q6": [1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0.5],
+            "Q30": [0, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 0.5],
+        }
         Q_rel_weights = {"Q6": 0.3, "Q30": 0.7}
-        
+
     elif dataset == "body":
         bias = B16
         bias_weight = 0.5
         rel_Qs = ["Q3", "Q21", "Q24"]
-        Q_biases = {"Q3": [0, 1, 0, 0.5], "Q21": [1, 0.75, 0.5, 0.25, 0, 0.5], "Q24": [0, 1, 0.5, 0.5]}
+        Q_biases = {
+            "Q3": [0, 1, 0, 0.5],
+            "Q21": [1, 0.75, 0.5, 0.25, 0, 0.5],
+            "Q24": [0, 1, 0.5, 0.5],
+        }
         Q_rel_weights = {"Q3": 0.4, "Q21": 0.3, "Q24": 0.3}
-        
+
     elif dataset == "attraction":
         bias = B17
         bias_weight = 0.5
         rel_Qs = ["Q26"]
         Q_biases = {"Q26": [1, 0, 0.5]}
         Q_rel_weights = {"Q26": 1}
-        
+
     elif dataset == "afterlife":
         bias = B18
         bias_weight = 0.5
         rel_Qs = ["Q3", "Q4"]
         Q_biases = {"Q3": [0, 1, 0, 0.5], "Q4": [0, 1, 0.5]}
         Q_rel_weights = {"Q3": 0.05, "Q4": 0.95}
-        
+
     elif dataset == "drinks":
         bias = B19
         bias_weight = 0.8
         rel_Qs = ["Q16"]
         Q_biases = {"Q16": [0, 1, 0.5]}
         Q_rel_weights = {"Q16": 1}
-    
+
     total_q_weights = 1 - bias_weight
 
     locations = np.zeros((len(names)))
@@ -392,7 +524,7 @@ def compute_locs(bias_filename, dataset, names, answers):
     for i in range(len(names)):
 
         biased_val_i = float(bias[i])
-        
+
         location = bias_weight * biased_val_i
 
         for Q in rel_Qs:
