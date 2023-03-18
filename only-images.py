@@ -135,6 +135,11 @@ def increment_cumcry_count(id, action):
     connection.commit()
 
 
+def clear_cumcry_counts():
+    cursor.execute("DELETE FROM cumcry")
+    connection.commit()
+
+
 def store_confession(confession):
     confession = confession[len('confess '):]
     cursor.execute("INSERT INTO confessions VALUES (?)", (confession,))
@@ -402,6 +407,16 @@ async def cum_leaderboard(interaction: Interaction):
 @commands.has_permissions(administrator=True)
 async def cry_leaderboard(interaction: Interaction):
     await cumcry_leaderboard(interaction, "cry")
+
+
+@tree.command(
+    name="clearcumcry",
+    description="clear cum/cry records",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+@commands.has_permissions(administrator=True)
+async def clear_cumcry(interaction: Interaction):
+    clear_cumcry_counts()
 
 
 @tree.command(
