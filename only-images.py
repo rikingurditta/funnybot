@@ -410,16 +410,20 @@ async def cry_leaderboard(interaction: Interaction):
 async def force_confess(interaction: Interaction):
     await interaction.response.defer()
     rowid, confession = get_random_confession()
-    await interaction.followup.send(embed=Embed(description=confession))
+    if confession == '':
+        await interaction.followup.send(content='no confessions')
+    else:
+        await interaction.followup.send(content='confession', embed=Embed(description=confession))
 
 
 async def post_confession():
     rowid, confession = get_random_confession()
+    if confession == '':
+        return
     delete_confession(rowid)
     if confession != "":
-        embed = Embed(description=confession)
         channel: TextChannel = await client.fetch_channel(CONFESSIONS_CHANNEL_ID)
-        await channel.send(embed=embed)
+        await channel.send(embed=Embed(content='confession', description=confession))
 
 
 async def process_dm(message):
