@@ -36,7 +36,9 @@ GENERAL_CHANNEL_ID = 1032482385205415947
 HI_CHAT_ID = 1032482927394693178
 BESTOF_CHANNEL_ID = 1075618133571809281
 OI_DEV_ROLE_ID = 1081679547302420541
-CONFESSIONS_CHANNEL_ID = 961029138129490032  # currently #bot-test-stuff
+RIIN_ROLE_ID = 1035448479742427196
+BOT_TEST_STUFF_CHANNEL_ID = 961029138129490032
+CONFESSIONS_CHANNEL_ID = GENERAL_CHANNEL_ID
 
 
 CUM_EMOJIS = ["💦", "🥵", "🤢", "🥛", "😋"]
@@ -401,7 +403,7 @@ async def cumcry_leaderboard(interaction: Interaction, action):
     description="cum leaderboard",
     guild=discord.Object(id=OI_GUILD_ID),
 )
-@commands.has_permissions(administrator=True)
+@app_commands.checks.has_any_role(RIIN_ROLE_ID)
 async def cum_leaderboard(interaction: Interaction):
     await cumcry_leaderboard(interaction, "cum")
 
@@ -411,7 +413,7 @@ async def cum_leaderboard(interaction: Interaction):
     description="cry leaderboard",
     guild=discord.Object(id=OI_GUILD_ID),
 )
-@commands.has_permissions(administrator=True)
+@app_commands.checks.has_any_role(RIIN_ROLE_ID)
 async def cry_leaderboard(interaction: Interaction):
     await cumcry_leaderboard(interaction, "cry")
 
@@ -421,7 +423,7 @@ async def cry_leaderboard(interaction: Interaction):
     description="cums and cries aggregated leaderboard",
     guild=discord.Object(id=OI_GUILD_ID),
 )
-@commands.has_permissions(administrator=True)
+@app_commands.checks.has_any_role(RIIN_ROLE_ID)
 async def cumsandcrys_leaderboard(interaction: Interaction):
     await interaction.response.defer()
     table = get_aggregated_cumcry_leaderboard()
@@ -447,7 +449,7 @@ async def cumsandcrys_leaderboard(interaction: Interaction):
     description="clear cum/cry records",
     guild=discord.Object(id=OI_GUILD_ID),
 )
-@commands.has_permissions(administrator=True)
+@app_commands.checks.has_any_role(RIIN_ROLE_ID)
 async def clear_cumcry(interaction: Interaction):
     clear_cumcry_counts()
     await interaction.followup.send(content='cums and cries cleared')
