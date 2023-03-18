@@ -174,9 +174,6 @@ async def on_message(message):
     if "cum" in message.content.lower():
         await message.add_reaction("<:lfg:961074481219117126>")
 
-    if not message.guild:
-        await process_dm(message)
-
     if message.channel.id == HI_CHAT_ID:
         update_message_count(message.author.id)
         print(f"deleting {message.id} in 15 minutes")
@@ -184,6 +181,9 @@ async def on_message(message):
 
     if message.author == client.user:
         return
+
+    if not message.guild:
+        await process_dm(message)
 
     if (
         message.content != "" or len(message.attachments) == 0
