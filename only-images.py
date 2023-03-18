@@ -185,7 +185,7 @@ async def on_message(message):
     if not message.guild:
         await process_dm(message)
 
-    if (
+    if messages.guild and (
         message.content != "" or len(message.attachments) == 0
     ) and message.channel.name == IMAGES_CHANNEL_NAME:
         print(f"deleting non only image in #{IMAGES_CHANNEL_NAME}")
