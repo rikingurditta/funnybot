@@ -185,7 +185,7 @@ async def on_message(message):
     if not message.guild:
         await process_dm(message)
 
-    if messages.guild and (
+    if message.guild and (
         message.content != "" or len(message.attachments) == 0
     ) and message.channel.name == IMAGES_CHANNEL_NAME:
         print(f"deleting non only image in #{IMAGES_CHANNEL_NAME}")
@@ -428,13 +428,13 @@ async def process_dm(message):
         return
     m = l[0]
     if m == "cum":
-        await message.reply(random.choice(CUM_EMOJIS), mention_author=True)
+        await message.add_reaction(random.choice(CUM_EMOJIS))
         increment_cumcry_count(message.author.id, "cum")
     elif m == "cry":
-        await message.reply(random.choice(CRY_EMOJIS), mention_author=True)
+        await message.add_reaction(random.choice(CRY_EMOJIS))
         increment_cumcry_count(message.author.id, "cry")
     elif m == "confess":
-        await message.reply(random.choice(CONFESS_EMOJIS), mention_author=True)
+        await message.add_reaction(random.choice(CONFESS_EMOJIS))
         store_confession(message.content)
     else:
         await message.reply(
