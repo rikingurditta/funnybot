@@ -478,7 +478,7 @@ async def post_confession():
     delete_confession(rowid)
     if confession != "":
         channel: TextChannel = await client.fetch_channel(CONFESSIONS_CHANNEL_ID)
-        await channel.send(embed=Embed(content='confession', description=confession))
+        await channel.send(content='confession', embed=Embed(description=confession))
 
 
 async def process_dm(message):
