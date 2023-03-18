@@ -6,6 +6,7 @@ from datetime import timezone
 import discord
 import os
 import sys
+import random
 from discord.ext import tasks
 from discord import (
     TextChannel,
@@ -34,6 +35,13 @@ GENERAL_CHANNEL_ID = 1032482385205415947
 HI_CHAT_ID = 1032482927394693178
 BESTOF_CHANNEL_ID = 1075618133571809281
 OI_DEV_ROLE_ID = 1081679547302420541
+CONFESSIONS_CHANNEL_ID = 961029138129490032  # currently #bot-test-stuff
+
+
+CUM_EMOJIS = {'💦', '🥵', '🤢', '🥛', '😋'}
+CRY_EMOJIS = {'😢', '🫂', '😭', '😔', '☹️'}
+CONFESS_EMOJIS = {'😳', '‼️', '⁉️', '💀', '😱'}
+
 
 tz = pytz.timezone("Canada/Eastern")
 
@@ -49,9 +57,16 @@ if db_version < 1:
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS oi (id TEXT NOT NULL, messagecount INT NOT NULL)"
     )
-LATEST_VERSION = 1
+if db_version < 2:
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS cumcry (id TEXT NOT NULL, cumcount INT NOT NULL, crycount INT NOT NULL)"
+    )
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS confessions (confession TEXT NOT NULL)"
+    )
+LATEST_VERSION = 2
 if db_version == 0:
-    cursor.execute("INSERT INTO schema_version VALUES (1)")
+    cursor.execute("INSERT INTO schema_version VALUES ?" (LATEST_VERSION,))
 else:
     cursor.execute("UPDATE schema_version SET version = ?", (LATEST_VERSION,))
 connection.commit()
@@ -85,6 +100,42 @@ def get_hi_leaderboard():
     return cursor.fetchall()
 
 
+def increment_cumcry_count(id, action):
+    cursor.execute("SELECT * FROM cumcry WHERE id = ?", (id,))
+    if len(cursor.fetchall()) == 0:
+        cursor.execute("INSERT INTO oi VALUES (?, 0, 0)", (id,))
+    if action == 'cum':
+        cursor.execute(
+            "UPDATE oi SET cumcount = cumcount + 1 WHERE id = ?", (id,)
+        )
+    if action == 'cry':
+        cursor.execute(
+            "UPDATE oi SET crycount = crycount + 1 WHERE id = ?", (id,)
+        )
+    connection.commit()
+
+
+def store_confession(confession):
+    cursor.execute("INSERT INTO confessions VALUES (?)", (confession,))
+    connection.commit()
+
+
+def get_confession():
+    cursor.execute("SELECT rowid, * FROM confessions ORDER BY RANDOM() LIMIT 1;")
+    table = cursor.fetchall()
+    rowid = -1
+    confession = ''
+    if len(table) > 0:
+        rowid = table[0][0]
+        confession = table[0][1]
+    return rowid, confession
+
+
+def delete_confession(rowid):
+    cursor.execute("DELETE * FROM confession WHERE rowid = ?", (rowid,))
+    connection.commit()
+
+
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
@@ -94,6 +145,7 @@ async def on_ready():
     # rose plot scheduler
     scheduler = AsyncIOScheduler()
     scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
+    scheduler.add_job(post_confession, CronTrigger(hour="18", minute="0", second="0"))
     scheduler.start()
 
 
@@ -101,6 +153,9 @@ async def on_ready():
 async def on_message(message):
     if "cum" in message.content.lower():
         await message.add_reaction("<:lfg:961074481219117126>")
+
+    if not message.guild:
+        await process_dm(message)
 
     if message.channel.id == HI_CHAT_ID:
         update_message_count(message.author.id)
@@ -274,6 +329,45 @@ async def post_plot_job():
     if channel is None:
         channel: TextChannel = await client.fetch_channel(GENERAL_CHANNEL_ID)
     await channel.send(file=discord.File("dailygraph.png"))
+
+
+@tree.command(
+    name="forceconfess",
+    description="Force confession to be posted",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+@app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+async def force_run_daily_plot(interaction: Interaction):
+    await interaction.response.defer()
+    rowid, confession = get_confession()
+    await interaction.followup.send(embed=Embed(description=confession))
+
+
+async def post_confession():
+    rowid, confession = get_confession()
+    delete_confession(rowid)
+    if confession != '':
+        embed = Embed(description=confession)
+        channel: TextChannel = await client.fetch_channel(CONFESSIONS_CHANNEL_ID)
+        await channel.send(embed=embed)
+
+
+async def process_dm(message):
+    l = message.content.lower().strip().split()
+    if len(l) == 0:
+        return
+    m = l[0]
+    if m == 'cum':
+        await message.reply(random.choice(CUM_EMOJIS), mention_author=True)
+        increment_cumcry_count(message.author.id, 'cum')
+    elif m == 'cry':
+        await message.reply(random.choice(CRY_EMOJIS), mention_author=True)
+        increment_cumcry_count(message.author.id, 'cry')
+    elif m == 'confess':
+        await message.reply(random.choice(CONFESS_EMOJIS), mention_author=True)
+        store_confession(message.content)
+    else:
+        await message.reply('start your message with either `cum`, `cry`, or `confess`', mention_author=True)
 
 
 client.run(os.environ["DISCORD_TOKEN"])
