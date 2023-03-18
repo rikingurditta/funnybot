@@ -126,12 +126,12 @@ def increment_cumcry_count(id, action):
             e = random.choice(cat)
             cursor.execute("SELECT * FROM cumcry WHERE emoji = ?", (e.aliases[0],))
         # create entry for user with their unique emoji
-        cursor.execute("INSERT INTO oi VALUES (?, ?, 0, 0)", (id, e.aliases[0]))
+        cursor.execute("INSERT INTO cumcry VALUES (?, ?, 0, 0)", (id, e.aliases[0]))
     # update counts
     if action == "cum":
-        cursor.execute("UPDATE oi SET cumcount = cumcount + 1 WHERE id = ?", (id,))
+        cursor.execute("UPDATE cumcry SET cumcount = cumcount + 1 WHERE id = ?", (id,))
     elif action == "cry":
-        cursor.execute("UPDATE oi SET crycount = crycount + 1 WHERE id = ?", (id,))
+        cursor.execute("UPDATE cumcry SET crycount = crycount + 1 WHERE id = ?", (id,))
     connection.commit()
 
 
@@ -413,6 +413,7 @@ async def force_confess(interaction: Interaction):
     if confession == '':
         await interaction.followup.send(content='no confessions')
     else:
+        delete_confession(rowid)
         await interaction.followup.send(content='confession', embed=Embed(description=confession))
 
 
