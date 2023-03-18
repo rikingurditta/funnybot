@@ -113,6 +113,13 @@ def get_cry_leaderboard():
     return cursor.fetchall()
 
 
+def get_aggregated_cumcry_leaderboard():
+    cursor.execute(
+        "SELECT id, emoji, cumcount + crycount FROM cumcry ORDER BY cumcount + crycount DESC"
+    )
+    return cursor.fetchall()
+
+
 def increment_cumcry_count(id, action):
     cursor.execute("SELECT * FROM cumcry WHERE id = ?", (id,))
     if len(cursor.fetchall()) == 0:
@@ -407,6 +414,32 @@ async def cum_leaderboard(interaction: Interaction):
 @commands.has_permissions(administrator=True)
 async def cry_leaderboard(interaction: Interaction):
     await cumcry_leaderboard(interaction, "cry")
+
+
+@tree.command(
+    name="cumsandcrys",
+    description="cums and cries aggregated leaderboard",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+@commands.has_permissions(administrator=True)
+async def cumsandcrys_leaderboard(interaction: Interaction):
+    await interaction.response.defer()
+    table = get_aggregated_cumcry_leaderboard()
+    i = 1
+    leaderboard = f"cums and crys leaderboard\n"
+    unknown_users = []
+    for row in table:
+        try:
+            user: User = client.get_user(row[0])
+            if user is None:
+                user: User = await client.fetch_user(row[0])
+        except:
+            unknown_users.append(row[0])
+            continue
+        leaderboard += f"#{i}: {emojis.encode(f':{row[1]}:')} - cums and cries: {row[2]:>3}\n"
+        i += 1
+    print(unknown_users)
+    await interaction.followup.send(leaderboard)
 
 
 @tree.command(
