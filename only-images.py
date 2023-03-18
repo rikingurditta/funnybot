@@ -39,9 +39,9 @@ OI_DEV_ROLE_ID = 1081679547302420541
 CONFESSIONS_CHANNEL_ID = 961029138129490032  # currently #bot-test-stuff
 
 
-CUM_EMOJIS = {"💦", "🥵", "🤢", "🥛", "😋"}
-CRY_EMOJIS = {"😢", "🫂", "😭", "😔", "☹️"}
-CONFESS_EMOJIS = {"😳", "‼️", "⁉️", "💀", "😱"}
+CUM_EMOJIS = ["💦", "🥵", "🤢", "🥛", "😋"]
+CRY_EMOJIS = ["😢", "🫂", "😭", "😔", "☹️"]
+CONFESS_EMOJIS = ["😳", "‼️", "⁉️", "💀", "😱"]
 
 
 tz = pytz.timezone("Canada/Eastern")
