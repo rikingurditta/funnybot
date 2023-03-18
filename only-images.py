@@ -7,7 +7,7 @@ import discord
 import os
 import sys
 import random
-from discord.ext import tasks
+from discord.ext import tasks, commands
 from discord import (
     TextChannel,
     RawReactionActionEvent,
