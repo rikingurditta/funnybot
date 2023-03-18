@@ -388,6 +388,7 @@ async def cumcry_leaderboard(interaction: Interaction, action):
     description="cum leaderboard",
     guild=discord.Object(id=OI_GUILD_ID),
 )
+@commands.has_permissions(administrator=True)
 async def cum_leaderboard(interaction: Interaction):
     await cumcry_leaderboard(interaction, "cum")
 
@@ -397,6 +398,7 @@ async def cum_leaderboard(interaction: Interaction):
     description="cry leaderboard",
     guild=discord.Object(id=OI_GUILD_ID),
 )
+@commands.has_permissions(administrator=True)
 async def cry_leaderboard(interaction: Interaction):
     await cumcry_leaderboard(interaction, "cry")
 
