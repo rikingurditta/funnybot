@@ -65,11 +65,7 @@ if db_version < 2:
     cursor.execute("CREATE TABLE IF NOT EXISTS confessions (confession TEXT NOT NULL)")
 LATEST_VERSION = 2
 if db_version == 0:
-    cursor.execute(
-        "INSERT INTO schema_version VALUES ?"(
-            LATEST_VERSION,
-        )
-    )
+    cursor.execute("INSERT INTO schema_version VALUES ?", (LATEST_VERSION,))
 else:
     cursor.execute("UPDATE schema_version SET version = ?", (LATEST_VERSION,))
 connection.commit()
