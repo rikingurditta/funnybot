@@ -21,6 +21,7 @@ from discord import (
 )
 import pytz
 import sqlite3
+import emojis
 
 from oi_daily_plot_functions import make_daily_graph
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -59,7 +60,7 @@ if db_version < 1:
     )
 if db_version < 2:
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS cumcry (id TEXT NOT NULL, cumcount INT NOT NULL, crycount INT NOT NULL)"
+        "CREATE TABLE IF NOT EXISTS cumcry (id TEXT NOT NULL, emoji TEXT NOT NULL, cumcount INT NOT NULL, crycount INT NOT NULL)"
     )
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS confessions (confession TEXT NOT NULL)"
@@ -100,15 +101,36 @@ def get_hi_leaderboard():
     return cursor.fetchall()
 
 
+def get_cum_leaderboard():
+    cursor.execute("SELECT id, emoji, cumcount, crycount FROM cumcry ORDER BY cumcount DESC")
+    return cursor.fetchall()
+
+
+def get_cry_leaderboard():
+    cursor.execute("SELECT id, emoji, cumcount, crycount FROM cumcry ORDER BY crycount DESC")
+    return cursor.fetchall()
+
+
 def increment_cumcry_count(id, action):
     cursor.execute("SELECT * FROM cumcry WHERE id = ?", (id,))
     if len(cursor.fetchall()) == 0:
-        cursor.execute("INSERT INTO oi VALUES (?, 0, 0)", (id,))
+        # choose random emoji from 'Animals & Nature' category
+        cat = [*emojis.db.get_emojis_by_category('Animals & Nature')]
+        e = random.choice(cat)
+        # check if anyone else has same emoji
+        cursor.execute("SELECT * FROM cumcry WHERE emoji = ?", (e.aliases[0],))
+        # repeat until we find one that no one else has
+        while len(cursor.fetchall()) > 0:
+            e = random.choice(cat)
+            cursor.execute("SELECT * FROM cumcry WHERE emoji = ?", (e.aliases[0],))
+        # create entry for user with their unique emoji
+        cursor.execute("INSERT INTO oi VALUES (?, ?, 0, 0)", (id, e.aliases[0]))
+    # update counts
     if action == 'cum':
         cursor.execute(
             "UPDATE oi SET cumcount = cumcount + 1 WHERE id = ?", (id,)
         )
-    if action == 'cry':
+    elif action == 'cry':
         cursor.execute(
             "UPDATE oi SET crycount = crycount + 1 WHERE id = ?", (id,)
         )
@@ -120,7 +142,7 @@ def store_confession(confession):
     connection.commit()
 
 
-def get_confession():
+def get_random_confession():
     cursor.execute("SELECT rowid, * FROM confessions ORDER BY RANDOM() LIMIT 1;")
     table = cursor.fetchall()
     rowid = -1
@@ -331,20 +353,70 @@ async def post_plot_job():
     await channel.send(file=discord.File("dailygraph.png"))
 
 
+async def cumcry_leaderboard(interaction: Interaction, action):
+    await interaction.response.defer()
+    table = None
+    if action == 'cum':
+        table = get_cum_leaderboard()
+    elif action == 'cry':
+        table = get_cry_leaderboard()
+    else:
+        return
+    i = 1
+    leaderboard = f'{action} leaderboard\n'
+    unknown_users = []
+    for row in table:
+        try:
+            user: User = client.get_user(row[0])
+            if user is None:
+                user: User = await client.fetch_user(row[0])
+        except:
+            unknown_users.append(row[0])
+            continue
+        cumtext = f'cum: {row[2]:>3}'
+        crytext = f'cry: {row[3]:>3}'
+        leaderboard += f'#{i}: {emojis.encode(row[1])} - '
+        if action == 'cum':
+            leaderboard += f'{cumtext}\t{crytext}\n'
+        else:
+            leaderboard += f'{crytext}\t{cumtext}\n'
+        i += 1
+    print(unknown_users)
+    await interaction.followup.send(leaderboard)
+
+
+@tree.command(
+    name="cumleaderboard",
+    description="cum leaderboard",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+async def cum_leaderboard(interaction: Interaction):
+    await cumcry_leaderboard(interaction, 'cum')
+
+
+@tree.command(
+    name="cryleaderboard",
+    description="cry leaderboard",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+async def cry_leaderboard(interaction: Interaction):
+    await cumcry_leaderboard(interaction, 'cry')
+
+
 @tree.command(
     name="forceconfess",
     description="Force confession to be posted",
     guild=discord.Object(id=OI_GUILD_ID),
 )
 @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
-async def force_run_daily_plot(interaction: Interaction):
+async def force_confess(interaction: Interaction):
     await interaction.response.defer()
-    rowid, confession = get_confession()
+    rowid, confession = get_random_confession()
     await interaction.followup.send(embed=Embed(description=confession))
 
 
 async def post_confession():
-    rowid, confession = get_confession()
+    rowid, confession = get_random_confession()
     delete_confession(rowid)
     if confession != '':
         embed = Embed(description=confession)
