@@ -450,6 +450,7 @@ async def cumsandcrys_leaderboard(interaction: Interaction):
 @commands.has_permissions(administrator=True)
 async def clear_cumcry(interaction: Interaction):
     clear_cumcry_counts()
+    await interaction.followup.send(content='cums and cries cleared')
 
 
 @tree.command(
