@@ -136,6 +136,7 @@ def increment_cumcry_count(id, action):
 
 
 def store_confession(confession):
+    confession = confession[len('confess '):]
     cursor.execute("INSERT INTO confessions VALUES (?)", (confession,))
     connection.commit()
 
@@ -152,7 +153,7 @@ def get_random_confession():
 
 
 def delete_confession(rowid):
-    cursor.execute("DELETE * FROM confession WHERE rowid = ?", (rowid,))
+    cursor.execute("DELETE FROM confessions WHERE rowid = ?", (rowid,))
     connection.commit()
 
 
