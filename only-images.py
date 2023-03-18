@@ -39,9 +39,9 @@ OI_DEV_ROLE_ID = 1081679547302420541
 CONFESSIONS_CHANNEL_ID = 961029138129490032  # currently #bot-test-stuff
 
 
-CUM_EMOJIS = {'💦', '🥵', '🤢', '🥛', '😋'}
-CRY_EMOJIS = {'😢', '🫂', '😭', '😔', '☹️'}
-CONFESS_EMOJIS = {'😳', '‼️', '⁉️', '💀', '😱'}
+CUM_EMOJIS = {"💦", "🥵", "🤢", "🥛", "😋"}
+CRY_EMOJIS = {"😢", "🫂", "😭", "😔", "☹️"}
+CONFESS_EMOJIS = {"😳", "‼️", "⁉️", "💀", "😱"}
 
 
 tz = pytz.timezone("Canada/Eastern")
@@ -62,12 +62,14 @@ if db_version < 2:
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS cumcry (id TEXT NOT NULL, emoji TEXT NOT NULL, cumcount INT NOT NULL, crycount INT NOT NULL)"
     )
-    cursor.execute(
-        "CREATE TABLE IF NOT EXISTS confessions (confession TEXT NOT NULL)"
-    )
+    cursor.execute("CREATE TABLE IF NOT EXISTS confessions (confession TEXT NOT NULL)")
 LATEST_VERSION = 2
 if db_version == 0:
-    cursor.execute("INSERT INTO schema_version VALUES ?" (LATEST_VERSION,))
+    cursor.execute(
+        "INSERT INTO schema_version VALUES ?"(
+            LATEST_VERSION,
+        )
+    )
 else:
     cursor.execute("UPDATE schema_version SET version = ?", (LATEST_VERSION,))
 connection.commit()
@@ -102,12 +104,16 @@ def get_hi_leaderboard():
 
 
 def get_cum_leaderboard():
-    cursor.execute("SELECT id, emoji, cumcount, crycount FROM cumcry ORDER BY cumcount DESC")
+    cursor.execute(
+        "SELECT id, emoji, cumcount, crycount FROM cumcry ORDER BY cumcount DESC"
+    )
     return cursor.fetchall()
 
 
 def get_cry_leaderboard():
-    cursor.execute("SELECT id, emoji, cumcount, crycount FROM cumcry ORDER BY crycount DESC")
+    cursor.execute(
+        "SELECT id, emoji, cumcount, crycount FROM cumcry ORDER BY crycount DESC"
+    )
     return cursor.fetchall()
 
 
@@ -115,7 +121,7 @@ def increment_cumcry_count(id, action):
     cursor.execute("SELECT * FROM cumcry WHERE id = ?", (id,))
     if len(cursor.fetchall()) == 0:
         # choose random emoji from 'Animals & Nature' category
-        cat = [*emojis.db.get_emojis_by_category('Animals & Nature')]
+        cat = [*emojis.db.get_emojis_by_category("Animals & Nature")]
         e = random.choice(cat)
         # check if anyone else has same emoji
         cursor.execute("SELECT * FROM cumcry WHERE emoji = ?", (e.aliases[0],))
@@ -126,14 +132,10 @@ def increment_cumcry_count(id, action):
         # create entry for user with their unique emoji
         cursor.execute("INSERT INTO oi VALUES (?, ?, 0, 0)", (id, e.aliases[0]))
     # update counts
-    if action == 'cum':
-        cursor.execute(
-            "UPDATE oi SET cumcount = cumcount + 1 WHERE id = ?", (id,)
-        )
-    elif action == 'cry':
-        cursor.execute(
-            "UPDATE oi SET crycount = crycount + 1 WHERE id = ?", (id,)
-        )
+    if action == "cum":
+        cursor.execute("UPDATE oi SET cumcount = cumcount + 1 WHERE id = ?", (id,))
+    elif action == "cry":
+        cursor.execute("UPDATE oi SET crycount = crycount + 1 WHERE id = ?", (id,))
     connection.commit()
 
 
@@ -146,7 +148,7 @@ def get_random_confession():
     cursor.execute("SELECT rowid, * FROM confessions ORDER BY RANDOM() LIMIT 1;")
     table = cursor.fetchall()
     rowid = -1
-    confession = ''
+    confession = ""
     if len(table) > 0:
         rowid = table[0][0]
         confession = table[0][1]
@@ -356,14 +358,14 @@ async def post_plot_job():
 async def cumcry_leaderboard(interaction: Interaction, action):
     await interaction.response.defer()
     table = None
-    if action == 'cum':
+    if action == "cum":
         table = get_cum_leaderboard()
-    elif action == 'cry':
+    elif action == "cry":
         table = get_cry_leaderboard()
     else:
         return
     i = 1
-    leaderboard = f'{action} leaderboard\n'
+    leaderboard = f"{action} leaderboard\n"
     unknown_users = []
     for row in table:
         try:
@@ -373,13 +375,13 @@ async def cumcry_leaderboard(interaction: Interaction, action):
         except:
             unknown_users.append(row[0])
             continue
-        cumtext = f'cum: {row[2]:>3}'
-        crytext = f'cry: {row[3]:>3}'
-        leaderboard += f'#{i}: {emojis.encode(row[1])} - '
-        if action == 'cum':
-            leaderboard += f'{cumtext}\t{crytext}\n'
+        cumtext = f"cum: {row[2]:>3}"
+        crytext = f"cry: {row[3]:>3}"
+        leaderboard += f"#{i}: {emojis.encode(row[1])} - "
+        if action == "cum":
+            leaderboard += f"{cumtext}\t{crytext}\n"
         else:
-            leaderboard += f'{crytext}\t{cumtext}\n'
+            leaderboard += f"{crytext}\t{cumtext}\n"
         i += 1
     print(unknown_users)
     await interaction.followup.send(leaderboard)
@@ -391,7 +393,7 @@ async def cumcry_leaderboard(interaction: Interaction, action):
     guild=discord.Object(id=OI_GUILD_ID),
 )
 async def cum_leaderboard(interaction: Interaction):
-    await cumcry_leaderboard(interaction, 'cum')
+    await cumcry_leaderboard(interaction, "cum")
 
 
 @tree.command(
@@ -400,7 +402,7 @@ async def cum_leaderboard(interaction: Interaction):
     guild=discord.Object(id=OI_GUILD_ID),
 )
 async def cry_leaderboard(interaction: Interaction):
-    await cumcry_leaderboard(interaction, 'cry')
+    await cumcry_leaderboard(interaction, "cry")
 
 
 @tree.command(
@@ -418,7 +420,7 @@ async def force_confess(interaction: Interaction):
 async def post_confession():
     rowid, confession = get_random_confession()
     delete_confession(rowid)
-    if confession != '':
+    if confession != "":
         embed = Embed(description=confession)
         channel: TextChannel = await client.fetch_channel(CONFESSIONS_CHANNEL_ID)
         await channel.send(embed=embed)
@@ -429,17 +431,20 @@ async def process_dm(message):
     if len(l) == 0:
         return
     m = l[0]
-    if m == 'cum':
+    if m == "cum":
         await message.reply(random.choice(CUM_EMOJIS), mention_author=True)
-        increment_cumcry_count(message.author.id, 'cum')
-    elif m == 'cry':
+        increment_cumcry_count(message.author.id, "cum")
+    elif m == "cry":
         await message.reply(random.choice(CRY_EMOJIS), mention_author=True)
-        increment_cumcry_count(message.author.id, 'cry')
-    elif m == 'confess':
+        increment_cumcry_count(message.author.id, "cry")
+    elif m == "confess":
         await message.reply(random.choice(CONFESS_EMOJIS), mention_author=True)
         store_confession(message.content)
     else:
-        await message.reply('start your message with either `cum`, `cry`, or `confess`', mention_author=True)
+        await message.reply(
+            "start your message with either `cum`, `cry`, or `confess`",
+            mention_author=True,
+        )
 
 
 client.run(os.environ["DISCORD_TOKEN"])
