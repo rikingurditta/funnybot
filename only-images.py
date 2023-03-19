@@ -329,7 +329,7 @@ async def purge_hi_chat_loop():
 @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
 async def force_run_daily_plot(interaction: Interaction):
     await interaction.response.defer()
-    make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
+    make_daily_graph("oi_responses.csv", "oi_biases.tsv")
     await interaction.followup.send(file=discord.File("dailygraph.png"))
 
 
@@ -359,7 +359,7 @@ async def hi_leaderboard(interaction: Interaction):
 
 
 async def post_plot_job():
-    make_daily_graph("oi_responses.tsv", "oi_biases.tsv")
+    make_daily_graph("oi_responses.csv", "oi_biases.tsv")
     channel: TextChannel = client.get_channel(GENERAL_CHANNEL_ID)
     if channel is None:
         channel: TextChannel = await client.fetch_channel(GENERAL_CHANNEL_ID)
