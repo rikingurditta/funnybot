@@ -219,7 +219,7 @@ def parse_csv(filename):
 
     text = np.transpose(
         np.genfromtxt(
-            filename, dtype=str, delimiter="\t", skip_header=1, usecols=range(1, 34)
+            filename, dtype=str, delimiter=",", skip_header=1, usecols=range(1, 34)
         )
     )
     (
