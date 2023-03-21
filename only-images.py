@@ -67,7 +67,9 @@ if db_version < 2:
         "CREATE TABLE IF NOT EXISTS cumcry (id TEXT NOT NULL, emoji TEXT NOT NULL, cumcount INT NOT NULL, crycount INT NOT NULL)"
     )
     cursor.execute("CREATE TABLE IF NOT EXISTS confessions (confession TEXT NOT NULL)")
-LATEST_VERSION = 2
+if db_version < 3:
+    cursor.execute("CREATE TABLE IF NOT EXISTS wyr (question TEXT NOT NULL)")
+LATEST_VERSION = 3
 if db_version == 0:
     cursor.execute("INSERT INTO schema_version VALUES ?", (LATEST_VERSION,))
 else:
@@ -182,7 +184,7 @@ def get_random_wyr():
     if len(table) > 0:
         rowid = table[0][0]
         wyr = table[0][1]
-    return rowid, confession
+    return rowid, wyr
 
 
 def delete_confession(rowid):
