@@ -160,7 +160,7 @@ def store_confession(confession):
 def store_wyr(wyr):
     wyr = wyr[len('wyr '):]
     cursor.execute("INSERT INTO wyr VALUES (?)", (wyr,))
-    wyr.commit()
+    connection.commit()
 
 
 def get_random_confession():
