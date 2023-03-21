@@ -39,11 +39,13 @@ OI_DEV_ROLE_ID = 1081679547302420541
 RIIN_ROLE_ID = 1035448479742427196
 BOT_TEST_STUFF_CHANNEL_ID = 961029138129490032
 CONFESSIONS_CHANNEL_ID = GENERAL_CHANNEL_ID
+WYR_CHANNEL_ID = GENERAL_CHANNEL_ID
 
 
 CUM_EMOJIS = ["💦", "🥵", "🤢", "🥛", "😋"]
 CRY_EMOJIS = ["😢", "🫂", "😭", "😔", "☹️"]
 CONFESS_EMOJIS = ["😳", "‼️", "⁉️", "💀", "😱"]
+WYR_EMOJIS = ["🅰️", "🅱️"]
 
 
 tz = pytz.timezone("Canada/Eastern")
@@ -155,6 +157,12 @@ def store_confession(confession):
     connection.commit()
 
 
+def store_wyr(wyr):
+    wyr = wyr[len('wyr '):]
+    cursor.execute("INSERT INTO wyr VALUES (?)", (wyr,))
+    wyr.commit()
+
+
 def get_random_confession():
     cursor.execute("SELECT rowid, * FROM confessions ORDER BY RANDOM() LIMIT 1;")
     table = cursor.fetchall()
@@ -166,8 +174,24 @@ def get_random_confession():
     return rowid, confession
 
 
+def get_random_wyr():
+    cursor.execute("SELECT rowid, * FROM wyr ORDER BY RANDOM() LIMIT 1;")
+    table = cursor.fetchall()
+    rowid = -1
+    wyr = ""
+    if len(table) > 0:
+        rowid = table[0][0]
+        wyr = table[0][1]
+    return rowid, confession
+
+
 def delete_confession(rowid):
     cursor.execute("DELETE FROM confessions WHERE rowid = ?", (rowid,))
+    connection.commit()
+
+
+def delete_wyr(rowid):
+    cursor.execute("DELETE FROM wyr WHERE rowid = ?", (rowid,))
     connection.commit()
 
 
@@ -179,8 +203,9 @@ async def on_ready():
 
     # rose plot scheduler
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
+    #scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
     scheduler.add_job(post_confession, CronTrigger(hour="18", minute="0", second="0"))
+    scheduler.add_job(post_wyr, CronTrigger(hour="12", minute="0", second="0"))
     scheduler.start()
 
 
@@ -471,6 +496,22 @@ async def force_confess(interaction: Interaction):
         await interaction.followup.send(content='confession', embed=Embed(description=confession))
 
 
+@tree.command(
+    name="forcewyr",
+    description="Force WYR to be posted",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+@app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+async def force_wyr(interaction: Interaction):
+    await interaction.response.defer()
+    rowid, wyr = get_random_wyr()
+    if wyr == '':
+        await interaction.followup.send(content='no options')
+    else:
+        delete_wyr(rowid)
+        await interaction.followup.send(content='Would you rather', embed=Embed(description=wyr))
+
+
 async def post_confession():
     rowid, confession = get_random_confession()
     if confession == '':
@@ -479,6 +520,16 @@ async def post_confession():
     if confession != "":
         channel: TextChannel = await client.fetch_channel(CONFESSIONS_CHANNEL_ID)
         await channel.send(content='confession', embed=Embed(description=confession))
+
+
+async def post_wyr():
+    rowid, wyr = get_random_wyr()
+    if wyr == '':
+        return
+    delete_wyr(rowid)
+    if wyr != "":
+        channel: TextChannel = await client.fetch_channel(WYR_CHANNEL_ID)
+        await channel.send(content='Would you rather', embed=Embed(description=wyr))
 
 
 async def process_dm(message):
@@ -495,9 +546,11 @@ async def process_dm(message):
     elif m == "confess":
         await message.add_reaction(random.choice(CONFESS_EMOJIS))
         store_confession(message.content)
+    elif m == "wyr":
+        store_wyr(message.content)
     else:
         await message.reply(
-            "start your message with either `cum`, `cry`, or `confess`",
+            "start your message with either `cum`, `cry`, `wyr`, or `confess`",
             mention_author=True,
         )
 
