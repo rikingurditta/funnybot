@@ -119,7 +119,7 @@ def get_cry_leaderboard():
 
 def get_aggregated_cumcry_leaderboard():
     cursor.execute(
-        "SELECT id, emoji, cumcount + crycount FROM cumcry ORDER BY cumcount + crycount DESC"
+        "SELECT id, emoji, cumcount + crycount FROM cumcry ORDER BY cumcount + crycount DESC, cumcount DESC"
     )
     return cursor.fetchall()
 
