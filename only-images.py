@@ -46,7 +46,7 @@ CUM_EMOJIS = ["💦", "🥵", "🤢", "🥛", "😋"]
 CRY_EMOJIS = ["😢", "🫂", "😭", "😔", "☹️"]
 CONFESS_EMOJIS = ["😳", "‼️", "⁉️", "💀", "😱"]
 WYR_EMOJIS = ["🅰️", "🅱️"]
-WYR_REACT_EMOJIS = ["🤔""]
+WYR_REACT_EMOJIS = ["🤔", "💭"]
 
 
 tz = pytz.timezone("Canada/Eastern")
