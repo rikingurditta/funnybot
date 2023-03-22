@@ -511,7 +511,9 @@ async def force_wyr(interaction: Interaction):
         await interaction.followup.send(content='no options')
     else:
         delete_wyr(rowid)
-        await interaction.followup.send(content='Would you rather', embed=Embed(description=wyr))
+        message = await interaction.followup.send(content='Would you rather', embed=Embed(description=wyr))
+        for emoji in WYR_EMOJIS:
+            await message.add_reaction(emoji)
 
 
 async def post_confession():
@@ -531,7 +533,9 @@ async def post_wyr():
     delete_wyr(rowid)
     if wyr != "":
         channel: TextChannel = await client.fetch_channel(WYR_CHANNEL_ID)
-        await channel.send(content='Would you rather', embed=Embed(description=wyr))
+        message = await channel.send(content='Would you rather', embed=Embed(description=wyr))
+        for emoji in WYR_EMOJIS:
+            await message.add_reaction(emoji)
 
 
 async def process_dm(message):
