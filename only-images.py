@@ -46,6 +46,7 @@ CUM_EMOJIS = ["💦", "🥵", "🤢", "🥛", "😋"]
 CRY_EMOJIS = ["😢", "🫂", "😭", "😔", "☹️"]
 CONFESS_EMOJIS = ["😳", "‼️", "⁉️", "💀", "😱"]
 WYR_EMOJIS = ["🅰️", "🅱️"]
+WYR_REACT_EMOJIS = ["🤔""]
 
 
 tz = pytz.timezone("Canada/Eastern")
@@ -553,6 +554,7 @@ async def process_dm(message):
         await message.add_reaction(random.choice(CONFESS_EMOJIS))
         store_confession(message.content)
     elif m == "wyr":
+        await message.add_reaction(random.choice(WYR_REACT_EMOJIS))
         store_wyr(message.content)
     else:
         await message.reply(
