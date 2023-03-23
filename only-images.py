@@ -208,7 +208,9 @@ def delete_confession(rowid):
 
 def delete_confession_by_hash(h):
     cursor.execute("DELETE FROM confessions WHERE hash = ?", (h,))
+    num_rows = cursor.rowcount
     connection.commit()
+    return num_rows
 
 
 def delete_wyr(rowid):
@@ -587,8 +589,11 @@ async def process_dm(message):
         await message.reply(h, mention_author=True)
     elif m == "unconfess":
         if len(l) > 1:
-            await message.add_reaction("🗑️")
-            delete_confession_by_hash(l[1])
+            num_rows = delete_confession_by_hash(l[1])
+            if num_rows > 0:
+                await message.add_reaction("🗑️")
+            else:
+                message.reply("Invalid hash!", mention_author=True)
     elif m == "wyr":
         h = store_wyr(message.content)
         await message.add_reaction(random.choice(WYR_REACT_EMOJIS))
