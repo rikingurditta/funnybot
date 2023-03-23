@@ -160,13 +160,14 @@ def clear_cumcry_counts():
 
 def store_confession(confession):
     confession = confession[len("confess ") :]
+    gen_hash = hashlib.sha1(confession.encode("utf-8")).hexdigest()
     h = (
         "Here is the hash for your confession: `"
-        + hashlib.sha1(confession.encode("utf-8")).hexdigest()
+        + gen_hash
         + '`. If you want to delete your confession, send the following message: "unconfess <hash>" and if deleted '
         "the bot will react with the trash can emoji."
     )
-    cursor.execute("INSERT INTO confessions VALUES (?, ?)", (confession, h))
+    cursor.execute("INSERT INTO confessions VALUES (?, ?)", (confession, gen_hash))
     connection.commit()
     return h
 
