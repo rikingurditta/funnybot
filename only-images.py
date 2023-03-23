@@ -593,7 +593,7 @@ async def process_dm(message):
             if num_rows > 0:
                 await message.add_reaction("🗑️")
             else:
-                message.reply("Invalid hash!", mention_author=True)
+                await message.reply("Invalid hash!", mention_author=True)
     elif m == "wyr":
         h = store_wyr(message.content)
         await message.add_reaction(random.choice(WYR_REACT_EMOJIS))
