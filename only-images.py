@@ -159,18 +159,21 @@ def clear_cumcry_counts():
 
 
 def store_confession(confession):
-    confession = confession[len('confess '):]
-    h = "Here is the hash for your confession: `" + hashlib.sha1(confession.encode('utf-8')).hexdigest() + \
-        "`. If you want to delete your confession, send the following message: \"unconfess <hash>\" and if deleted " \
+    confession = confession[len("confess ") :]
+    h = (
+        "Here is the hash for your confession: `"
+        + hashlib.sha1(confession.encode("utf-8")).hexdigest()
+        + '`. If you want to delete your confession, send the following message: "unconfess <hash>" and if deleted '
         "the bot will react with the trash can emoji."
+    )
     cursor.execute("INSERT INTO confessions VALUES (?, ?)", (confession, h))
     connection.commit()
     return h
 
 
 def store_wyr(wyr):
-    wyr = wyr[len('wyr '):]
-    h = hashlib.sha1(wyr.encode('utf-8')).hexdigest()
+    wyr = wyr[len("wyr ") :]
+    h = hashlib.sha1(wyr.encode("utf-8")).hexdigest()
     cursor.execute("INSERT INTO wyr VALUES (?, ?)", (wyr, h))
     connection.commit()
     return h
@@ -226,7 +229,7 @@ async def on_ready():
 
     # rose plot scheduler
     scheduler = AsyncIOScheduler()
-    #scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
+    # scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
     scheduler.add_job(post_confession, CronTrigger(hour="18", minute="0", second="0"))
     scheduler.add_job(post_wyr, CronTrigger(hour="12", minute="0", second="0"))
     scheduler.start()
@@ -248,9 +251,11 @@ async def on_message(message):
     if not message.guild:
         await process_dm(message)
 
-    if message.guild and (
-        message.content != "" or len(message.attachments) == 0
-    ) and message.channel.name == IMAGES_CHANNEL_NAME:
+    if (
+        message.guild
+        and (message.content != "" or len(message.attachments) == 0)
+        and message.channel.name == IMAGES_CHANNEL_NAME
+    ):
         print(f"deleting non only image in #{IMAGES_CHANNEL_NAME}")
         print(message.channel.name)
         await message.delete()
@@ -483,7 +488,9 @@ async def cumsandcrys_leaderboard(interaction: Interaction):
         except:
             unknown_users.append(row[0])
             continue
-        leaderboard += f"#{i:>3}: {emojis.encode(f':{row[1]}:')} - cums and cries: {row[2]:>3}\n"
+        leaderboard += (
+            f"#{i:>3}: {emojis.encode(f':{row[1]}:')} - cums and cries: {row[2]:>3}\n"
+        )
         i += 1
     print(unknown_users)
     await interaction.followup.send(leaderboard)
@@ -498,7 +505,7 @@ async def cumsandcrys_leaderboard(interaction: Interaction):
 async def clear_cumcry(interaction: Interaction):
     # clear_cumcry_counts()
     # await interaction.followup.send(content='cums and cries cleared')
-    await interaction.followup.send(content='function disabled')
+    await interaction.followup.send(content="function disabled")
 
 
 @tree.command(
@@ -510,11 +517,13 @@ async def clear_cumcry(interaction: Interaction):
 async def force_confess(interaction: Interaction):
     await interaction.response.defer()
     rowid, confession = get_random_confession()
-    if confession == '':
-        await interaction.followup.send(content='no confessions')
+    if confession == "":
+        await interaction.followup.send(content="no confessions")
     else:
         delete_confession(rowid)
-        await interaction.followup.send(content='confession', embed=Embed(description=confession))
+        await interaction.followup.send(
+            content="confession", embed=Embed(description=confession)
+        )
 
 
 @tree.command(
@@ -526,33 +535,37 @@ async def force_confess(interaction: Interaction):
 async def force_wyr(interaction: Interaction):
     await interaction.response.defer()
     rowid, wyr = get_random_wyr()
-    if wyr == '':
-        await interaction.followup.send(content='no options')
+    if wyr == "":
+        await interaction.followup.send(content="no options")
     else:
         delete_wyr(rowid)
-        message = await interaction.followup.send(content='Would you rather', embed=Embed(description=wyr))
+        message = await interaction.followup.send(
+            content="Would you rather", embed=Embed(description=wyr)
+        )
         for emoji in WYR_EMOJIS:
             await message.add_reaction(emoji)
 
 
 async def post_confession():
     rowid, confession = get_random_confession()
-    if confession == '':
+    if confession == "":
         return
     delete_confession(rowid)
     if confession != "":
         channel: TextChannel = await client.fetch_channel(CONFESSIONS_CHANNEL_ID)
-        await channel.send(content='confession', embed=Embed(description=confession))
+        await channel.send(content="confession", embed=Embed(description=confession))
 
 
 async def post_wyr():
     rowid, wyr = get_random_wyr()
-    if wyr == '':
+    if wyr == "":
         return
     delete_wyr(rowid)
     if wyr != "":
         channel: TextChannel = await client.fetch_channel(WYR_CHANNEL_ID)
-        message = await channel.send(content='Would you rather', embed=Embed(description=wyr))
+        message = await channel.send(
+            content="Would you rather", embed=Embed(description=wyr)
+        )
         for emoji in WYR_EMOJIS:
             await message.add_reaction(emoji)
 
@@ -572,17 +585,17 @@ async def process_dm(message):
         h = store_confession(message.content)
         await message.add_reaction(random.choice(CONFESS_EMOJIS))
         await message.reply(h, mention_author=True)
-    elif m == 'unconfess':
+    elif m == "unconfess":
         if len(l) > 1:
-            await message.add_reaction('🗑️')
+            await message.add_reaction("🗑️")
             delete_confession_by_hash(l[1])
     elif m == "wyr":
         h = store_wyr(message.content)
         await message.add_reaction(random.choice(WYR_REACT_EMOJIS))
         await message.reply(h, mention_author=True)
-    elif m == 'unwyr':
+    elif m == "unwyr":
         if len(l) > 1:
-            await message.add_reaction('🗑️')
+            await message.add_reaction("🗑️")
             delete_wyr_by_hash(l[1])
     else:
         await message.reply(
