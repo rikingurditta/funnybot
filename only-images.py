@@ -380,7 +380,7 @@ async def hi_leaderboard(interaction: Interaction):
         except:
             unknown_users.append(row[0])
             continue
-        leaderboard += f"#{i}: **{user.display_name}** - {row[1]} messages\n"
+        leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} messages\n"
         i += 1
     print(unknown_users)
     await interaction.followup.send(leaderboard)
@@ -416,7 +416,7 @@ async def cumcry_leaderboard(interaction: Interaction, action):
             continue
         cumtext = f"cum: {row[2]:>3}"
         crytext = f"cry: {row[3]:>3}"
-        leaderboard += f"#{i}: {emojis.encode(f':{row[1]}:')} - "
+        leaderboard += f"#{i:>3}: {emojis.encode(f':{row[1]}:')} - "
         if action == "cum":
             leaderboard += f"{cumtext}\t{crytext}\n"
         else:
@@ -466,7 +466,7 @@ async def cumsandcrys_leaderboard(interaction: Interaction):
         except:
             unknown_users.append(row[0])
             continue
-        leaderboard += f"#{i}: {emojis.encode(f':{row[1]}:')} - cums and cries: {row[2]:>3}\n"
+        leaderboard += f"#{i:>3}: {emojis.encode(f':{row[1]}:')} - cums and cries: {row[2]:>3}\n"
         i += 1
     print(unknown_users)
     await interaction.followup.send(leaderboard)
