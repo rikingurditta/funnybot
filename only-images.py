@@ -2,6 +2,7 @@ import asyncio
 from time import sleep
 import datetime
 from datetime import timezone
+import hashlib
 
 import discord
 import os
@@ -70,7 +71,10 @@ if db_version < 2:
     cursor.execute("CREATE TABLE IF NOT EXISTS confessions (confession TEXT NOT NULL)")
 if db_version < 3:
     cursor.execute("CREATE TABLE IF NOT EXISTS wyr (question TEXT NOT NULL)")
-LATEST_VERSION = 3
+if db_version < 4:
+    cursor.execute("ALTER TABLE confessions ADD hash TEXT")
+    cursor.execute("ALTER TABLE wyr ADD hash TEXT")
+LATEST_VERSION = 4
 if db_version == 0:
     cursor.execute("INSERT INTO schema_version VALUES ?", (LATEST_VERSION,))
 else:
@@ -156,18 +160,22 @@ def clear_cumcry_counts():
 
 def store_confession(confession):
     confession = confession[len('confess '):]
-    cursor.execute("INSERT INTO confessions VALUES (?)", (confession,))
+    h = hashlib.sha1(confession.encode('utf-8')).hexdigest()
+    cursor.execute("INSERT INTO confessions VALUES (?, ?)", (confession, h))
     connection.commit()
+    return h
 
 
 def store_wyr(wyr):
     wyr = wyr[len('wyr '):]
-    cursor.execute("INSERT INTO wyr VALUES (?)", (wyr,))
+    h = hashlib.sha1(wyr.encode('utf-8')).hexdigest()
+    cursor.execute("INSERT INTO wyr VALUES (?, ?)", (wyr, h))
     connection.commit()
+    return h
 
 
 def get_random_confession():
-    cursor.execute("SELECT rowid, * FROM confessions ORDER BY RANDOM() LIMIT 1;")
+    cursor.execute("SELECT rowid, * FROM confessions ORDER BY RANDOM() LIMIT 1")
     table = cursor.fetchall()
     rowid = -1
     confession = ""
@@ -178,7 +186,7 @@ def get_random_confession():
 
 
 def get_random_wyr():
-    cursor.execute("SELECT rowid, * FROM wyr ORDER BY RANDOM() LIMIT 1;")
+    cursor.execute("SELECT rowid, * FROM wyr ORDER BY RANDOM() LIMIT 1")
     table = cursor.fetchall()
     rowid = -1
     wyr = ""
@@ -193,8 +201,18 @@ def delete_confession(rowid):
     connection.commit()
 
 
+def delete_confession_by_hash(h):
+    cursor.execute("DELETE FROM confessions WHERE hash = ?", (h,))
+    connection.commit()
+
+
 def delete_wyr(rowid):
     cursor.execute("DELETE FROM wyr WHERE rowid = ?", (rowid,))
+    connection.commit()
+
+
+def delete_wyr_by_hash(h):
+    cursor.execute("DELETE FROM wyr WHERE hash = ?", (h,))
     connection.commit()
 
 
@@ -549,14 +567,24 @@ async def process_dm(message):
         await message.add_reaction(random.choice(CRY_EMOJIS))
         increment_cumcry_count(message.author.id, "cry")
     elif m == "confess":
+        h = store_confession(message.content)
         await message.add_reaction(random.choice(CONFESS_EMOJIS))
-        store_confession(message.content)
+        await message.reply(h, mention_author=True)
+    elif m == 'unconfess':
+        if len(l) > 1:
+            await message.add_reaction('🗑️')
+            delete_confession_by_hash(l[1])
     elif m == "wyr":
+        h = store_wyr(message.content)
         await message.add_reaction(random.choice(WYR_REACT_EMOJIS))
-        store_wyr(message.content)
+        await message.reply(h, mention_author=True)
+    elif m == 'unwyr':
+        if len(l) > 1:
+            await message.add_reaction('🗑️')
+            delete_wyr_by_hash(l[1])
     else:
         await message.reply(
-            "start your message with either `cum`, `cry`, `wyr`, or `confess`",
+            "start your message with either `cum`, `cry`, `wyr`, `confess`, `unwyr`, or `unconfess`",
             mention_author=True,
         )
 
