@@ -431,7 +431,6 @@ async def cumcry_leaderboard(interaction: Interaction, action):
     description="cum leaderboard",
     guild=discord.Object(id=OI_GUILD_ID),
 )
-@app_commands.checks.has_any_role(RIIN_ROLE_ID)
 async def cum_leaderboard(interaction: Interaction):
     await cumcry_leaderboard(interaction, "cum")
 
@@ -441,7 +440,6 @@ async def cum_leaderboard(interaction: Interaction):
     description="cry leaderboard",
     guild=discord.Object(id=OI_GUILD_ID),
 )
-@app_commands.checks.has_any_role(RIIN_ROLE_ID)
 async def cry_leaderboard(interaction: Interaction):
     await cumcry_leaderboard(interaction, "cry")
 
@@ -451,7 +449,6 @@ async def cry_leaderboard(interaction: Interaction):
     description="cums and cries aggregated leaderboard",
     guild=discord.Object(id=OI_GUILD_ID),
 )
-@app_commands.checks.has_any_role(RIIN_ROLE_ID)
 async def cumsandcrys_leaderboard(interaction: Interaction):
     await interaction.response.defer()
     table = get_aggregated_cumcry_leaderboard()
@@ -477,7 +474,7 @@ async def cumsandcrys_leaderboard(interaction: Interaction):
     description="clear cum/cry records",
     guild=discord.Object(id=OI_GUILD_ID),
 )
-@app_commands.checks.has_any_role(RIIN_ROLE_ID)
+@app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
 async def clear_cumcry(interaction: Interaction):
     clear_cumcry_counts()
     await interaction.followup.send(content='cums and cries cleared')
