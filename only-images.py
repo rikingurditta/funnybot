@@ -72,8 +72,8 @@ if db_version < 2:
 if db_version < 3:
     cursor.execute("CREATE TABLE IF NOT EXISTS wyr (question TEXT NOT NULL)")
 if db_version < 4:
-    cursor.execute("ALTER TABLE confessions ADD hash TEXT")
-    cursor.execute("ALTER TABLE wyr ADD hash TEXT")
+    cursor.execute("ALTER TABLE confessions ADD COLUMN IF NOT EXISTS hash TEXT")
+    cursor.execute("ALTER TABLE wyr ADD COLUMN IF NOT EXISTS hash TEXT")
 LATEST_VERSION = 4
 if db_version == 0:
     cursor.execute("INSERT INTO schema_version VALUES ?", (LATEST_VERSION,))
