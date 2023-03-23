@@ -418,9 +418,9 @@ async def cumcry_leaderboard(interaction: Interaction, action):
         crytext = f"cry: {row[3]:>3}"
         leaderboard += f"#{i:>3}: {emojis.encode(f':{row[1]}:')} - "
         if action == "cum":
-            leaderboard += f"{cumtext}\t{crytext}\n"
+            leaderboard += f"{cumtext}\n"
         else:
-            leaderboard += f"{crytext}\t{cumtext}\n"
+            leaderboard += f"{crytext}\n"
         i += 1
     print(unknown_users)
     await interaction.followup.send(leaderboard)
