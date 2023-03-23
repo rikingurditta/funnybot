@@ -476,8 +476,9 @@ async def cumsandcrys_leaderboard(interaction: Interaction):
 )
 @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
 async def clear_cumcry(interaction: Interaction):
-    clear_cumcry_counts()
-    await interaction.followup.send(content='cums and cries cleared')
+    # clear_cumcry_counts()
+    # await interaction.followup.send(content='cums and cries cleared')
+    await interaction.followup.send(content='function disabled')
 
 
 @tree.command(
