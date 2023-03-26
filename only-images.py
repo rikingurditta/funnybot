@@ -639,6 +639,6 @@ async def later(interaction: Interaction, days: int, hours: int):
     # TODO: scheduled role addition/removal every night/week night
 
 async def remove_role(user, role):
-    await user.remove_roles(role, "scheduled role removal by bot")
+    await user.remove_roles([role], "scheduled role removal by bot")
 
 client.run(os.environ["DISCORD_TOKEN"])
