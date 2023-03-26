@@ -628,7 +628,7 @@ async def later(interaction: Interaction, days: int, hours: int):
     + datetime.timedelta(days=days, hours=hours)
 
     # add role
-    await user.add_roles(*role, "role added by bot")
+    await user.add_roles(role, "role added by bot")
 
     # schedule role removal 
     await interaction.followup.send("later!")
@@ -639,6 +639,6 @@ async def later(interaction: Interaction, days: int, hours: int):
     # TODO: scheduled role addition/removal every night/week night
 
 async def remove_role(user, role):
-    await user.remove_roles([role], "scheduled role removal by bot")
+    await user.remove_roles(role, "scheduled role removal by bot")
 
 client.run(os.environ["DISCORD_TOKEN"])
