@@ -96,6 +96,7 @@ client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 scheduler = AsyncIOScheduler()
 
+
 def update_message_count(id):
     cursor.execute("SELECT * FROM oi WHERE id = ?", (id,))
     if len(cursor.fetchall()) == 0:
