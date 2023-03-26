@@ -27,6 +27,7 @@ import emojis
 from oi_daily_plot_functions import make_daily_graph
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
 
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
@@ -41,6 +42,7 @@ RIIN_ROLE_ID = 1035448479742427196
 BOT_TEST_STUFF_CHANNEL_ID = 961029138129490032
 CONFESSIONS_CHANNEL_ID = GENERAL_CHANNEL_ID
 WYR_CHANNEL_ID = GENERAL_CHANNEL_ID
+LATER_ROLE_ID = 1052688337745485824
 
 
 CUM_EMOJIS = ["💦", "🥵", "🤢", "🥛", "😋"]
@@ -92,6 +94,7 @@ intents = discord.Intents(
 )
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
+scheduler = AsyncIOScheduler()
 
 
 def update_message_count(id):
@@ -231,7 +234,6 @@ async def on_ready():
     purge_hi_chat_loop.start()
 
     # rose plot scheduler
-    scheduler = AsyncIOScheduler()
     # scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
     scheduler.add_job(post_confession, CronTrigger(hour="18", minute="0", second="0"))
     scheduler.add_job(post_wyr, CronTrigger(hour="12", minute="0", second="0"))
@@ -609,5 +611,34 @@ async def process_dm(message):
             mention_author=True,
         )
 
+
+@tree.command(
+    name="later",
+    description="later role",
+    guild=discord.Object(id=OI_GUILD_ID),
+)
+@app_commands.describe(
+    hours="number of hours until role is removed",
+)
+async def later(interaction: Interaction, days: int, hours: int):
+    await interaction.response.defer()
+    user = interaction.user
+    role = discord.Object(id=LATER_ROLE_ID)
+    remove_time = tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc) 
+    + datetime.timedelta(days=days, hours=hours)
+
+    # add role
+    await user.add_roles(*role, "role added by bot")
+
+    # schedule role removal 
+    await interaction.followup.send("later!")
+    scheduler.add_job(remove_role, DateTrigger(run_date=remove_time), args=[user, role]) 
+
+    # TODO: better followup message
+    # TODO: store the roles/times in backup
+    # TODO: scheduled role addition/removal every night/week night
+
+async def remove_role(user, role):
+    await user.remove_roles(role, "scheduled role removal by bot")
 
 client.run(os.environ["DISCORD_TOKEN"])
