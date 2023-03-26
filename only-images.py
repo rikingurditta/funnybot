@@ -624,11 +624,10 @@ async def later(interaction: Interaction, days: int, hours: int):
     await interaction.response.defer()
     user = interaction.user
     role = discord.Object(id=LATER_ROLE_ID)
-    remove_time = tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc) 
-    + datetime.timedelta(days=days, hours=hours)
+    remove_time = tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc) + datetime.timedelta(days=days, hours=hours)
 
     # add role
-    await user.add_roles(role, "role added by bot")
+    await user.add_roles(role, reason="role added by bot")
 
     # schedule role removal 
     await interaction.followup.send("later!")
