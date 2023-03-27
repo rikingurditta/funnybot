@@ -34,7 +34,7 @@ client = commands.Bot(command_prefix=CMD_PREFIX, intents=intents)
 
 
 async def load_extensions():
-    for cog_file in ["Confessions", "CumCry", "WYR", "Later", "DailyPlots.DailyPlots"]:
+    for cog_file in ["Confessions", "CumCry", "WYR", "Later", "DailyPlots"]:
         try:
             await client.load_extension(f"cogs.{cog_file}")
             print(f"Loaded extension {cog_file}")
