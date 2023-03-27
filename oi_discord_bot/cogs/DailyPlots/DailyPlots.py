@@ -15,7 +15,7 @@ class DailyPlots(commands.Cog):
         pass
 
     async def post_plot_job(self):
-        make_daily_graph("oi_responses.csv", "oi_biases.tsv")
+        make_daily_graph("cogs/DailyPlots/oi_responses.csv", "cogs/DailyPlots/oi_biases.tsv")
         channel: TextChannel = self.client.get_channel(GENERAL_CHANNEL_ID)
         if channel is None:
             channel: TextChannel = await self.client.fetch_channel(GENERAL_CHANNEL_ID)
@@ -29,11 +29,9 @@ class DailyPlots(commands.Cog):
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
     async def force_run_daily_plot(self, interaction: Interaction):
         await interaction.response.defer()
-        print("before making plot")
         make_daily_graph(
-            "oi_responses.csv", "oi_biases.tsv"
+            "cogs/DailyPlots/oi_responses.csv", "cogs/DailyPlots/oi_biases.tsv"
         )
-        print("after making plot")
         await interaction.followup.send(file=discord.File("dailygraph.png"))
 
 
