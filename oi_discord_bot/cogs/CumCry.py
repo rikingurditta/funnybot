@@ -120,4 +120,4 @@ class CumCry(commands.Cog):
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(DailyPlots(bot))
+    await bot.add_cog(CumCry(bot))
