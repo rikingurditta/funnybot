@@ -1,4 +1,3 @@
-import asyncio
 import traceback
 from time import sleep
 import datetime
@@ -229,6 +228,7 @@ async def main():
     async with client:
         await client.start(os.environ["DISCORD_TOKEN"])
         await client.tree.sync(guild=discord.Object(id=OI_GUILD_ID))
+
 
 if __name__ == "__main__":
     asyncio.run(main())

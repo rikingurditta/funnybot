@@ -5,7 +5,7 @@ import discord
 from discord import TextChannel, app_commands, Interaction
 from discord.ext import commands
 from oi_discord_bot.config import *
-from DailyPlots_Utils.oi_daily_plot_functions import make_daily_graph
+from .oi_daily_plot_functions import make_daily_graph
 
 
 class DailyPlots(commands.Cog):
@@ -18,7 +18,7 @@ class DailyPlots(commands.Cog):
         pass
 
     async def post_plot_job(self):
-        make_daily_graph("DailyPlots_Utils/oi_responses.csv", "oi_biases.tsv")
+        make_daily_graph("DailyPlots/oi_responses.csv", "oi_biases.tsv")
         channel: TextChannel = self.client.get_channel(GENERAL_CHANNEL_ID)
         if channel is None:
             channel: TextChannel = await self.client.fetch_channel(GENERAL_CHANNEL_ID)

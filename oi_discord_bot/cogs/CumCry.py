@@ -8,7 +8,7 @@ from discord.ext import commands
 from oi_discord_bot.config import *
 
 
-class DailyPlots(commands.Cog):
+class CumCry(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
