@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append("")
 import discord
 from discord import TextChannel, app_commands, Interaction
 from discord.ext import commands
@@ -18,7 +15,7 @@ class DailyPlots(commands.Cog):
         pass
 
     async def post_plot_job(self):
-        make_daily_graph("DailyPlots/oi_responses.csv", "oi_biases.tsv")
+        make_daily_graph("oi_responses.csv", "oi_biases.tsv")
         channel: TextChannel = self.client.get_channel(GENERAL_CHANNEL_ID)
         if channel is None:
             channel: TextChannel = await self.client.fetch_channel(GENERAL_CHANNEL_ID)
@@ -33,7 +30,7 @@ class DailyPlots(commands.Cog):
     async def force_run_daily_plot(self, interaction: Interaction):
         await interaction.response.defer()
         make_daily_graph(
-            "../daily_plots/oi_responses.csv", "../daily_plots/oi_biases.tsv"
+            "oi_responses.csv", "oi_biases.tsv"
         )
         await interaction.followup.send(file=discord.File("dailygraph.png"))
 
