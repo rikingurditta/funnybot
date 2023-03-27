@@ -623,7 +623,7 @@ async def process_dm(message):
 async def later(interaction: Interaction, days: int, hours: int):
     await interaction.response.defer()
     user = interaction.user
-    role = discord.Object(id=LATER_ROLE_ID)
+    role = await get_role(LATER_ROLE_ID)
     remove_time = tz.normalize(datetime.datetime.now(tz)).astimezone(
         pytz.utc
     ) + datetime.timedelta(days=days, hours=hours)
@@ -642,6 +642,13 @@ async def later(interaction: Interaction, days: int, hours: int):
 
 async def remove_role(user, role):
     await user.remove_roles(role, "scheduled role removal by bot")
+
+
+async def get_role(role_id):
+    guild = client.get_guild(OI_GUILD_ID)
+    if guild is None:
+        guild = await client.fetch_guild(OI_GUILD_ID)
+    return guild.get_role(role_id)
 
 
 client.run(os.environ["DISCORD_TOKEN"])
