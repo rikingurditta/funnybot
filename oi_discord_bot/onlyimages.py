@@ -37,11 +37,13 @@ tree = client.tree
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
-    await client.load_extension("cogs.DailyPlots.DailyPlots")
-    await client.load_extension("cogs.Confessions")
-    await client.load_extension("cogs.CumCry")
-    await client.load_extension("cogs.WYR")
-    await client.load_extension("cogs.Later")
+    for cog_file in ["DailyPlots, Confessions, CumCry, WYR, Later"]:
+        try:
+            await client.load_extension(f"cogs.{cog_file}")
+            print(f"Loaded extension {cog_file}")
+        except (commands.ExtensionNotFound, commands.ExtensionAlreadyLoaded, commands.NoEntryPointError,
+                commands.ExtensionFailed) as e:
+            print(f"Could not load extension - {e}")
     scheduler.start()
     await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
 
