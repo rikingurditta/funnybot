@@ -35,7 +35,7 @@ tree = client.tree
 
 
 async def load_extensions():
-    for cog_file in ["DailyPlots.DailyPlots", "Confessions", "CumCry", "WYR", "Later"]:
+    for cog_file in ["Confessions", "CumCry", "WYR", "Later", "DailyPlots.DailyPlots"]:
         try:
             await client.load_extension(f"cogs.{cog_file}")
             print(f"Loaded extension {cog_file}")
@@ -53,7 +53,6 @@ async def load_extensions():
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
-    await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
 
 
 @client.event
@@ -191,6 +190,8 @@ async def process_dm(message):
     if len(l) == 0:
         return
     m = l[0]
+    if m == "sync" and message.author.id in OI_BOT_DEV_IDS:
+        await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
     if m == "cum":
         await message.add_reaction(random.choice(CUM_EMOJIS))
         db.increment_cumcry_count(message.author.id, "cum")
