@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 from time import sleep
 import datetime
 
@@ -44,6 +45,7 @@ async def load_extensions():
             commands.NoEntryPointError,
             commands.ExtensionFailed,
         ) as e:
+            traceback.print_exc()
             print(f"Could not load extension - {e}")
 
 
@@ -52,7 +54,6 @@ async def on_ready():
     print("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
     await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
-    scheduler.start()
 
 
 @client.event
