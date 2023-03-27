@@ -228,5 +228,5 @@ async def main():
     async with client:
         await client.start(os.environ["DISCORD_TOKEN"])
 
-
+global_event_loop = asyncio.get_running_loop()
 global_event_loop.run(main())
