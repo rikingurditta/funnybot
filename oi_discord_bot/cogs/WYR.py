@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 import discord
 from apscheduler.triggers.cron import CronTrigger
 from discord import Interaction, app_commands, TextChannel, Embed

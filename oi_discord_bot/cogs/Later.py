@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 import datetime
 import discord
 import pytz

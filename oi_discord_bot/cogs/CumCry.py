@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 import discord
 import emojis
 from discord import Interaction, User, app_commands
