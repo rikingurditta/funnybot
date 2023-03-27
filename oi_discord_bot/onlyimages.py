@@ -51,6 +51,7 @@ async def load_extensions():
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
+    scheduler.start()
 
 
 @client.event
