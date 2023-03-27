@@ -1,3 +1,5 @@
+import traceback
+
 import numpy as np
 import numpy.random as rd
 import matplotlib
@@ -595,14 +597,18 @@ def create_plot(names, colours, dataset1, dataset2, axes1, axes2):
 
 def make_daily_graph(filename, bias_filename):
 
-    names, colours, answers = parse_csv(filename)
+    try:
+        names, colours, answers = parse_csv(filename)
 
-    dataset1, dataset2 = generate_datasets()
+        dataset1, dataset2 = generate_datasets()
 
-    axes1, axes2 = get_axis_labels(dataset1), get_axis_labels(dataset2)
+        axes1, axes2 = get_axis_labels(dataset1), get_axis_labels(dataset2)
 
-    coords1, coords2 = compute_locs(
-        bias_filename, dataset1, names, answers
-    ), compute_locs(bias_filename, dataset2, names, answers)
+        coords1, coords2 = compute_locs(
+            bias_filename, dataset1, names, answers
+        ), compute_locs(bias_filename, dataset2, names, answers)
 
-    create_plot(names, colours, coords1, coords2, axes1, axes2)
+        create_plot(names, colours, coords1, coords2, axes1, axes2)
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
