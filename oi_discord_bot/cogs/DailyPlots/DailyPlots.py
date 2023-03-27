@@ -1,12 +1,12 @@
 import sys
+
 sys.path.append("..")
 import discord
 from discord import TextChannel, app_commands, Interaction
 from discord.ext import commands
 from oi_discord_bot.config import *
 from oi_discord_bot.onlyimages import tree
-from oi_daily_plot_functions import make_daily_graph
-
+from .oi_daily_plot_functions import make_daily_graph
 
 
 class DailyPlots(commands.Cog):
