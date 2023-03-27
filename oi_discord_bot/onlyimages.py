@@ -33,19 +33,26 @@ client = commands.Bot(command_prefix=CMD_PREFIX, intents=intents)
 tree = client.tree
 
 
-@client.event
-async def on_ready():
-    print("We have logged in as {0.user}".format(client))
-    purge_hi_chat_loop.start()
+async def load_extensions():
     for cog_file in ["DailyPlots.DailyPlots", "Confessions", "CumCry", "WYR", "Later"]:
         try:
             await client.load_extension(f"cogs.{cog_file}")
             print(f"Loaded extension {cog_file}")
-        except (commands.ExtensionNotFound, commands.ExtensionAlreadyLoaded, commands.NoEntryPointError,
-                commands.ExtensionFailed) as e:
+        except (
+            commands.ExtensionNotFound,
+            commands.ExtensionAlreadyLoaded,
+            commands.NoEntryPointError,
+            commands.ExtensionFailed,
+        ) as e:
             print(f"Could not load extension - {e}")
-    scheduler.start()
+
+
+@client.event
+async def on_ready():
+    print("We have logged in as {0.user}".format(client))
+    purge_hi_chat_loop.start()
     await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
+    scheduler.start()
 
 
 @client.event
@@ -215,4 +222,10 @@ async def process_dm(message):
         )
 
 
-client.run(os.environ["DISCORD_TOKEN"])
+async def main():
+    await load_extensions()
+    async with client:
+        await client.start(os.environ["DISCORD_TOKEN"])
+
+
+asyncio.run(main())
