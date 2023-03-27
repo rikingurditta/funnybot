@@ -42,7 +42,7 @@ class OIDatabase:
         LATEST_VERSION = 4
         if db_version == 0:
             self.cursor.execute(
-                "INSERT INTO schema_version VALUES ?", (LATEST_VERSION,)
+                "INSERT INTO schema_version VALUES (?)", (LATEST_VERSION,)
             )
         else:
             self.cursor.execute(
