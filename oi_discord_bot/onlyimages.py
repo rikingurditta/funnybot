@@ -229,4 +229,4 @@ async def main():
         await client.start(os.environ["DISCORD_TOKEN"])
 
 
-asyncio.run(main())
+global_event_loop.run(main())

@@ -1,5 +1,7 @@
 from database import OIDatabase
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import asyncio
+import uvloop
 
 CMD_PREFIX = "="
 STAR_THRESHOLD = 5
@@ -24,5 +26,7 @@ CONFESS_EMOJIS = ["😳", "‼️", "⁉️", "💀", "😱"]
 WYR_EMOJIS = ["🅰️", "🅱️"]
 WYR_REACT_EMOJIS = ["🤔", "💭"]
 
-scheduler = AsyncIOScheduler()
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+global_event_loop = asyncio.get_event_loop()
+scheduler = AsyncIOScheduler(global_event_loop)
 db = OIDatabase()
