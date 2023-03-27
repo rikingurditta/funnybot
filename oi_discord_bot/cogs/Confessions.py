@@ -6,7 +6,6 @@ from apscheduler.triggers.cron import CronTrigger
 from discord import app_commands, Interaction, Embed, TextChannel
 from discord.ext import commands
 from oi_discord_bot.config import *
-from oi_discord_bot.onlyimages import tree
 
 
 class Confessions(commands.Cog):
@@ -19,11 +18,11 @@ class Confessions(commands.Cog):
             self.post_confession, CronTrigger(hour="18", minute="0", second="0")
         )
 
-    @tree.command(
+    @app_commands.command(
         name="forceconfess",
         description="Force confession to be posted",
-        guild=discord.Object(id=OI_GUILD_ID),
     )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
     async def force_confess(self, interaction: Interaction):
         await interaction.response.defer()

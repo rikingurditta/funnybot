@@ -31,7 +31,6 @@ intents = discord.Intents(
     messages=True, reactions=True, guilds=True, message_content=True, members=True
 )
 client = commands.Bot(command_prefix=CMD_PREFIX, intents=intents)
-tree = client.tree
 
 
 async def load_extensions():
@@ -191,7 +190,8 @@ async def process_dm(message):
         return
     m = l[0]
     if m == "sync" and message.author.id in OI_BOT_DEV_IDS:
-        await tree.sync(guild=discord.Object(id=OI_GUILD_ID))
+        await client.tree.sync(guild=discord.Object(id=OI_GUILD_ID))
+        return
     if m == "cum":
         await message.add_reaction(random.choice(CUM_EMOJIS))
         db.increment_cumcry_count(message.author.id, "cum")
@@ -228,6 +228,7 @@ async def main():
     await load_extensions()
     async with client:
         await client.start(os.environ["DISCORD_TOKEN"])
+        await client.tree.sync(guild=discord.Object(id=OI_GUILD_ID))
 
 if __name__ == "__main__":
     asyncio.run(main())

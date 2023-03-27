@@ -16,11 +16,11 @@ class Later(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    @tree.command(
+    @app_commands.command(
         name="later",
         description="later role",
-        guild=discord.Object(id=OI_GUILD_ID),
     )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.describe(
         hours="number of hours until role is removed",
     )

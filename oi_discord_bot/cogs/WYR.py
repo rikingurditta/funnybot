@@ -6,7 +6,6 @@ from apscheduler.triggers.cron import CronTrigger
 from discord import Interaction, app_commands, TextChannel, Embed
 from discord.ext import commands
 from oi_discord_bot.config import *
-from oi_discord_bot.onlyimages import tree
 
 
 class WYR(commands.Cog):
@@ -17,11 +16,11 @@ class WYR(commands.Cog):
     async def on_ready(self):
         scheduler.add_job(self.post_wyr, CronTrigger(hour="12", minute="0", second="0"))
 
-    @tree.command(
+    @app_commands.command(
         name="forcewyr",
         description="Force WYR to be posted",
-        guild=discord.Object(id=OI_GUILD_ID),
     )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
     async def force_wyr(self, interaction: Interaction):
         await interaction.response.defer()

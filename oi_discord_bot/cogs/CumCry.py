@@ -6,18 +6,17 @@ import emojis
 from discord import Interaction, User, app_commands
 from discord.ext import commands
 from oi_discord_bot.config import *
-from oi_discord_bot.onlyimages import tree
 
 
 class DailyPlots(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    @tree.command(
+    @app_commands.command(
         name="hileaderboard",
         description="leaderboard for messages in #hi chat",
-        guild=discord.Object(id=OI_GUILD_ID),
     )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     async def hi_leaderboard(self, interaction: Interaction):
         await interaction.response.defer()
         table = db.get_hi_leaderboard()
@@ -68,27 +67,27 @@ class DailyPlots(commands.Cog):
         print(unknown_users)
         await interaction.followup.send(leaderboard)
 
-    @tree.command(
+    @app_commands.command(
         name="cumleaderboard",
         description="cum leaderboard",
-        guild=discord.Object(id=OI_GUILD_ID),
     )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     async def cum_leaderboard(self, interaction: Interaction):
         await self.cumcry_leaderboard(interaction, "cum")
 
-    @tree.command(
+    @app_commands.command(
         name="cryleaderboard",
         description="cry leaderboard",
-        guild=discord.Object(id=OI_GUILD_ID),
     )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     async def cry_leaderboard(self, interaction: Interaction):
         await self.cumcry_leaderboard(interaction, "cry")
 
-    @tree.command(
+    @app_commands.command(
         name="cumsandcrys",
         description="cums and cries aggregated leaderboard",
-        guild=discord.Object(id=OI_GUILD_ID),
     )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     async def cumsandcrys_leaderboard(self, interaction: Interaction):
         await interaction.response.defer()
         table = db.get_aggregated_cumcry_leaderboard()
@@ -108,11 +107,11 @@ class DailyPlots(commands.Cog):
         print(unknown_users)
         await interaction.followup.send(leaderboard)
 
-    @tree.command(
+    @app_commands.command(
         name="clearcumcry",
         description="clear cum/cry records",
-        guild=discord.Object(id=OI_GUILD_ID),
     )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
     async def clear_cumcry(self, interaction: Interaction):
         # clear_cumcry_counts()
