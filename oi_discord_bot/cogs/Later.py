@@ -9,7 +9,7 @@ from discord import app_commands, Interaction
 from discord.ext import commands
 from oi_discord_bot.config import *
 from oi_discord_bot.utils import get_role, remove_role
-from oi_discord_bot.onlyimages import tree, tz
+from oi_discord_bot.onlyimages import tz
 
 
 class Later(commands.Cog):
