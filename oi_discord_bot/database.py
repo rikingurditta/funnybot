@@ -4,7 +4,7 @@ import sqlite3
 
 import emojis
 
-from config import DB_NAME
+DB_NAME = "oi.db"
 
 
 class OIDatabase:
