@@ -37,7 +37,7 @@ tree = client.tree
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
-    await client.load_extension("cogs.DailyPlots")
+    await client.load_extension("cogs.DailyPlots.DailyPlots")
     await client.load_extension("cogs.Confessions")
     await client.load_extension("cogs.CumCry")
     await client.load_extension("cogs.WYR")
