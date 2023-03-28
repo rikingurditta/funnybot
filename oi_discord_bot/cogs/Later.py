@@ -11,7 +11,8 @@ from oi_discord_bot.config import *
 from oi_discord_bot.utils import get_role, remove_role, datetime_tz_str_to_datetime
 from oi_discord_bot.onlyimages import tz
 import logging
-logging.basicConfig(format='%(message)s')
+
+logging.basicConfig(format="%(message)s")
 log = logging.getLogger(__name__)
 
 
@@ -26,7 +27,9 @@ class Later(commands.Cog):
         for job in jobs:
             member_id = job[0]
             remove_time = datetime_tz_str_to_datetime(job[1])
-            logging.warning(f"rebuilding later delete job for {member_id} at {remove_time}")
+            logging.warning(
+                f"rebuilding later delete job for {member_id} at {remove_time}"
+            )
             scheduler.add_job(
                 self.remove_later_role,
                 DateTrigger(run_date=remove_time),
@@ -41,13 +44,17 @@ class Later(commands.Cog):
     @app_commands.describe(
         hours="number of hours until role is removed",
     )
-    async def later(self, interaction: Interaction, days: int = 0, hours: int = 0, minutes: int = 0):
+    async def later(
+        self, interaction: Interaction, days: int = 0, hours: int = 0, minutes: int = 0
+    ):
         await interaction.response.defer()
         if days < 0 or hours < 0 or minutes < 0:
             await interaction.followup.send("no negative numbers allowed!")
             return
         if days + hours + minutes == 0:
-            await interaction.followup.send("you must set a duration greater than zero!")
+            await interaction.followup.send(
+                "you must set a duration greater than zero!"
+            )
             return
         user = interaction.user
         role = await get_role(self.client, LATER_ROLE_ID)
@@ -59,7 +66,11 @@ class Later(commands.Cog):
         await user.add_roles(role, reason="later role requested by user")
 
         # schedule role removal
-        await interaction.followup.send("later!")
+        await interaction.followup.send(
+            "later! see you at {}".format(
+                remove_time.replace(tzinfo=pytz.utc).astimezone(tz)
+            )
+        )
         scheduler.add_job(
             self.remove_later_role,
             DateTrigger(run_date=remove_time),
