@@ -82,6 +82,7 @@ class Later(commands.Cog):
         # TODO: scheduled role addition/removal every night/week night
 
     async def remove_later_role(self, user_id: int, remove_time):
+        log.warning("removing later role for {}".format(user_id))
         await remove_role(self.client, LATER_ROLE_ID, user_id)
         db.delete_later_delete_job(str(user_id), remove_time)
 
