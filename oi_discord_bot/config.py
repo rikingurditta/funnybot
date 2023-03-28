@@ -28,5 +28,4 @@ WYR_EMOJIS = ["🅰️", "🅱️"]
 WYR_REACT_EMOJIS = ["🤔", "💭"]
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-scheduler = AsyncIOScheduler()
 db = OIDatabase()

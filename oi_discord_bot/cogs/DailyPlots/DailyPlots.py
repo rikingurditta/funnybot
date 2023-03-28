@@ -3,15 +3,22 @@ from discord import TextChannel, app_commands, Interaction
 from discord.ext import commands
 from oi_discord_bot.config import *
 from .oi_daily_plot_functions import make_daily_graph
+import logging
+
+logging.basicConfig(format="%(message)s")
+log = logging.getLogger(__name__)
 
 
 class DailyPlots(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
+        self.scheduler = AsyncIOScheduler()
 
     @commands.Cog.listener()
     async def on_ready(self):
         # scheduler.add_job(post_plot_job, CronTrigger(hour="12", minute="0", second="0"))
+        # self.scheduler.start()
+        # log.warning("dailyplot jobs: " + str(self.scheduler.get_jobs()))
         pass
 
     async def post_plot_job(self):

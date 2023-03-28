@@ -6,15 +6,22 @@ from apscheduler.triggers.cron import CronTrigger
 from discord import Interaction, app_commands, TextChannel, Embed
 from discord.ext import commands
 from oi_discord_bot.config import *
+import logging
+
+logging.basicConfig(format="%(message)s")
+log = logging.getLogger(__name__)
 
 
 class WYR(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
+        self.scheduler = AsyncIOScheduler()
 
     @commands.Cog.listener()
     async def on_ready(self):
-        scheduler.add_job(self.post_wyr, CronTrigger(hour="12", minute="0", second="0"))
+        self.scheduler.add_job(self.post_wyr, CronTrigger(hour="12", minute="0", second="0"))
+        self.scheduler.start()
+        log.warning("wyr jobs: " + str(self.scheduler.get_jobs()))
 
     @app_commands.command(
         name="forcewyr",

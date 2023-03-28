@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)
 class Later(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
+        self.scheduler = AsyncIOScheduler()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -30,11 +31,13 @@ class Later(commands.Cog):
             logging.warning(
                 f"rebuilding later delete job for {member_id} at {remove_time}"
             )
-            scheduler.add_job(
+            self.scheduler.add_job(
                 self.remove_later_role,
                 DateTrigger(run_date=remove_time),
                 args=[member_id, str(remove_time)],
             )
+        self.scheduler.start()
+        log.warning("later jobs: " + str(self.scheduler.get_jobs()))
 
     @app_commands.command(
         name="later",
@@ -71,11 +74,12 @@ class Later(commands.Cog):
                 remove_time.replace(tzinfo=pytz.utc).astimezone(tz)
             )
         )
-        scheduler.add_job(
+        self.scheduler.add_job(
             self.remove_later_role,
             DateTrigger(run_date=remove_time),
             args=[user.id, remove_time],
         )
+        log.warning(str(self.scheduler.get_jobs()))
         db.create_later_delete_job(str(user.id), remove_time)
 
         # TODO: better followup message
@@ -85,6 +89,7 @@ class Later(commands.Cog):
         log.warning("removing later role for {}".format(user_id))
         await remove_role(self.client, LATER_ROLE_ID, user_id)
         db.delete_later_delete_job(str(user_id), remove_time)
+        log.warning(str(self.scheduler.get_jobs()))
 
 
 async def setup(bot: commands.Bot) -> None:

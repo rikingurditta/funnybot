@@ -51,7 +51,6 @@ async def load_extensions():
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
-    scheduler.start()
 
 
 @client.event
@@ -192,9 +191,6 @@ async def process_dm(message):
     if m == "sync" and message.author.id in OI_BOT_DEV_IDS:
         await client.tree.sync(guild=discord.Object(id=OI_GUILD_ID))
         await message.reply("syncing complete")
-        return
-    if m == "jobs" and message.author.id in OI_BOT_DEV_IDS:
-        await message.reply(f"jobs: {scheduler.get_jobs()}")
         return
     if m == "cum":
         await message.add_reaction(random.choice(CUM_EMOJIS))
