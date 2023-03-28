@@ -231,5 +231,6 @@ async def main():
         await client.tree.sync(guild=discord.Object(id=OI_GUILD_ID))
 
 
+# do this so asyncio.run() doesn't trigger every time oi_discord_bot is imported
 if __name__ == "__main__":
     asyncio.run(main())

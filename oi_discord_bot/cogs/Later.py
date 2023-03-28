@@ -16,6 +16,19 @@ class Later(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        # re-build scheduler with jobs from db lost when bot restarted
+        jobs = db.get_later_delete_jobs()
+        for job in jobs:
+            member_id = job[0]
+            remove_time = job[1]
+            scheduler.add_job(
+                self.remove_later_role,
+                DateTrigger(run_date=remove_time),
+                args=[member_id, remove_time],
+            )
+
     @app_commands.command(
         name="later",
         description="later role",
@@ -33,17 +46,23 @@ class Later(commands.Cog):
         ) + datetime.timedelta(days=days, hours=hours)
 
         # add role
-        await user.add_roles(role, reason="role added by oi_discord_bot")
+        await user.add_roles(role, reason="later role requested by user")
 
         # schedule role removal
         await interaction.followup.send("later!")
         scheduler.add_job(
-            remove_role, DateTrigger(run_date=remove_time), args=[user, role]
+            self.remove_later_role,
+            DateTrigger(run_date=remove_time),
+            args=[user.id, remove_time],
         )
+        db.create_later_delete_job(str(user.id), remove_time)
 
         # TODO: better followup message
-        # TODO: store the roles/times in backup
         # TODO: scheduled role addition/removal every night/week night
+
+    async def remove_later_role(self, user_id: int, remove_time):
+        await remove_role(self.client, LATER_ROLE_ID, user_id)
+        db.delete_later_delete_job(str(user_id), remove_time)
 
 
 async def setup(bot: commands.Bot) -> None:

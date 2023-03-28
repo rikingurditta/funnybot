@@ -39,7 +39,11 @@ class OIDatabase:
         if db_version < 4:
             self.cursor.execute("ALTER TABLE confessions ADD COLUMN hash TEXT")
             self.cursor.execute("ALTER TABLE wyr ADD COLUMN hash TEXT")
-        LATEST_VERSION = 4
+        if db_version < 5:
+            self.cursor.execute(
+                "CREATE TABLE IF NOT EXISTS later_deletion (member_id TEXT NOT NULL, remove_time TEXT NOT NULL)"
+            )
+        LATEST_VERSION = 5
         if db_version == 0:
             self.cursor.execute(
                 "INSERT INTO schema_version VALUES (?)", (LATEST_VERSION,)
@@ -176,3 +180,28 @@ class OIDatabase:
     def delete_wyr_by_hash(self, h):
         self.cursor.execute("DELETE FROM wyr WHERE hash = ?", (h,))
         self.connection.commit()
+
+    def create_later_delete_job(self, member_id, remove_time):
+        self.cursor.execute(
+            "INSERT INTO later_deletion VALUES (?, ?)",
+            (
+                member_id,
+                remove_time,
+            ),
+        )
+        self.connection.commit()
+
+    def delete_later_delete_job(self, member_id, remove_time):
+        self.cursor.execute(
+            "DELETE FROM later_deletion WHERE member_id = ? AND remove_time = ?",
+            (
+                member_id,
+                remove_time,
+            ),
+        )
+        self.connection.commit()
+
+    def get_all_later_deletion_jobs(self):
+        self.cursor.execute("SELECT member_id, remove_time FROM later_deletion")
+        entries = self.cursor.fetchall()
+        return entries
