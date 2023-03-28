@@ -41,13 +41,13 @@ class Later(commands.Cog):
     @app_commands.describe(
         hours="number of hours until role is removed",
     )
-    async def later(self, interaction: Interaction, days: int, hours: int):
+    async def later(self, interaction: Interaction, days: int = 0, hours: int = 1, minutes: int = 0):
         await interaction.response.defer()
         user = interaction.user
         role = await get_role(self.client, LATER_ROLE_ID)
         remove_time = tz.normalize(datetime.datetime.now(tz)).astimezone(
             pytz.utc
-        ) + datetime.timedelta(days=days, hours=hours)
+        ) + datetime.timedelta(days=days, hours=hours, minutes=minutes)
 
         # add role
         await user.add_roles(role, reason="later role requested by user")
