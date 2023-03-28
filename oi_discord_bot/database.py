@@ -235,12 +235,12 @@ class OIDatabase:
 
     def count_cum_date_entries_by_id(self, member_id):
         self.cursor.execute(
-            "SELECT COUNT(*) FROM cumtime WHERE member_id = ?", (member_id,)
+            "SELECT COUNT(*) FROM cumtime WHERE id = ?", (member_id,)
         )
         return self.cursor.fetchone()[0]
 
     def count_cry_date_entries_by_id(self, member_id):
         self.cursor.execute(
-            "SELECT COUNT(*) FROM crytime WHERE member_id = ?", (member_id,)
+            "SELECT COUNT(*) FROM crytime WHERE id = ?", (member_id,)
         )
         return self.cursor.fetchone()[0]

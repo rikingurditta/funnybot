@@ -7,7 +7,7 @@ import discord
 import emojis
 from discord import Interaction, User, app_commands
 from discord.ext import commands
-from oi_discord_bot.utils import get_member
+from oi_discord_bot.utils import get_user
 from oi_discord_bot.config import *
 
 
@@ -133,13 +133,14 @@ class CumCry(commands.Cog):
         entries = db.get_all_cumcry_entries()
         for entry in entries:
             try:
-                member: discord.Member = await get_member(
-                    self.client, entry[0], OI_GUILD_ID
+                user: discord.User = await get_user(
+                    self.client, entry[0]
                 )
-                dm_channel = member.dm_channel
+                dm_channel = user.dm_channel
                 if dm_channel is None:
-                    logging.warning(f"DM channel not found for {member.display_name}")
-                    await member.create_dm()
+                    logging.warning(f"DM channel not found for {user.display_name}")
+                    dm_channel = await user.create_dm()
+                    await asyncio.sleep(10)
                 async for message in dm_channel.history(limit=1000):
                     if message.author.id == self.client.user.id:
                         continue
@@ -151,8 +152,9 @@ class CumCry(commands.Cog):
                         db.insert_cum_date_entry(entry[0], message.created_at)
                     elif m == "cry":
                         db.insert_cry_date_entry(entry[0], message.created_at)
-                total_cry_count = db.get_cry_count(entry[0])
-                total_cum_count = db.get_cum_count(entry[0])
+                total_cry_count = db.count_cry_date_entries_by_id(entry[0])
+                total_cum_count = db.count_cum_date_entries_by_id(entry[0])
+                print(total_cum_count, total_cry_count)
                 ret_string += (
                     f"{entry[1]}: cum: {total_cum_count} cry: {total_cry_count}\n"
                 )
