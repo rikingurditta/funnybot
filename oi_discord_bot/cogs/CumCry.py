@@ -130,7 +130,7 @@ class CumCry(commands.Cog):
     async def forcecumcry(self, interaction: Interaction):
         await interaction.response.defer()
         ret_string = "Gathered counts: \n"
-        entries = db.get_cumcry_entries()
+        entries = db.get_all_cumcry_entries()
         for entry in entries:
             try:
                 member: discord.Member = await get_member(
