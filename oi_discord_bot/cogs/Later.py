@@ -23,6 +23,7 @@ class Later(commands.Cog):
         for job in jobs:
             member_id = job[0]
             remove_time = job[1]
+            print(f"rebuilding later delete job for {member_id} at {remove_time}")
             scheduler.add_job(
                 self.remove_later_role,
                 DateTrigger(run_date=remove_time),
