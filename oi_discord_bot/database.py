@@ -43,7 +43,14 @@ class OIDatabase:
             self.cursor.execute(
                 "CREATE TABLE IF NOT EXISTS later_deletion (member_id TEXT NOT NULL, remove_time TEXT NOT NULL)"
             )
-        LATEST_VERSION = 5
+        if db_version < 6:
+            self.cursor.execute(
+                "CREATE TABLE IF NOT EXISTS cumtime (id TEXT NOT NULL, datetime TEXT NOT NULL)"
+            )
+            self.cursor.execute(
+                "CREATE TABLE IF NOT EXISTS crytime (id TEXT NOT NULL, datetime TEXT NOT NULL)"
+            )
+        LATEST_VERSION = 6
         if db_version == 0:
             self.cursor.execute(
                 "INSERT INTO schema_version VALUES (?)", (LATEST_VERSION,)
@@ -205,3 +212,35 @@ class OIDatabase:
         self.cursor.execute("SELECT member_id, remove_time FROM later_deletion")
         entries = self.cursor.fetchall()
         return entries
+
+    def get_all_cumcry_entries(self):
+        self.cursor.execute("SELECT * FROM cumcry")
+        entries = self.cursor.fetchall()
+        return entries
+
+    def update_cumcry_entry(self, id, num_cum, num_cry):
+        self.cursor.execute(
+            "UPDATE cumcry SET cumcount = ?, crycount = ? WHERE id = ?",
+            (num_cum, num_cry, id),
+        )
+        self.connection.commit()
+
+    def insert_cum_date_entry(self, member_id, date):
+        self.cursor.execute("INSERT INTO cumtime VALUES (?, ?)", (member_id, date))
+        self.connection.commit()
+
+    def insert_cry_date_entry(self, member_id, date):
+        self.cursor.execute("INSERT INTO crytime VALUES (?, ?)", (member_id, date))
+        self.connection.commit()
+
+    def count_cum_date_entries_by_id(self, member_id):
+        self.cursor.execute(
+            "SELECT COUNT(*) FROM cumtime WHERE member_id = ?", (member_id,)
+        )
+        return self.cursor.fetchone()[0]
+
+    def count_cry_date_entries_by_id(self, member_id):
+        self.cursor.execute(
+            "SELECT COUNT(*) FROM crytime WHERE member_id = ?", (member_id,)
+        )
+        return self.cursor.fetchone()[0]

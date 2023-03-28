@@ -1,10 +1,13 @@
+import logging
 import sys
+import traceback
 
 sys.path.append("..")
 import discord
 import emojis
 from discord import Interaction, User, app_commands
 from discord.ext import commands
+from oi_discord_bot.utils import get_member
 from oi_discord_bot.config import *
 
 
@@ -117,6 +120,49 @@ class CumCry(commands.Cog):
         # clear_cumcry_counts()
         # await interaction.followup.send(content='cums and cries cleared')
         await interaction.followup.send(content="function disabled")
+
+    @app_commands.command(
+        name="forcecumcry",
+        description="DO NOT RUN THIS MORE THAN ONCE - gathers cumcry records",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+    async def forcecumcry(self, interaction: Interaction):
+        await interaction.response.defer()
+        ret_string = "Gathered counts: \n"
+        entries = db.get_cumcry_entries()
+        for entry in entries:
+            try:
+                member: discord.Member = await get_member(
+                    self.client, entry[0], OI_GUILD_ID
+                )
+                dm_channel = member.dm_channel
+                if dm_channel is None:
+                    logging.warning(f"DM channel not found for {member.display_name}")
+                    continue
+                else:
+                    async for message in dm_channel.history(limit=1000):
+                        if message.author.id == self.client.user.id:
+                            continue
+                        l = message.content.lower().strip().split()
+                        if len(l) == 0:
+                            continue
+                        m = l[0]
+                        if m == "cum":
+                            db.insert_cum_date_entry(entry[0], message.created_at)
+                        elif m == "cry":
+                            db.insert_cry_date_entry(entry[0], message.created_at)
+                    total_cry_count = db.get_cry_count(entry[0])
+                    total_cum_count = db.get_cum_count(entry[0])
+                    ret_string += (
+                        f"{entry[1]}: cum: {total_cum_count} cry: {total_cry_count}\n"
+                    )
+            except Exception as e:
+                print(entry[0])
+                print(e)
+                traceback.print_exc()
+                continue
+        await interaction.followup.send(content=ret_string)
 
 
 async def setup(bot: commands.Bot) -> None:
