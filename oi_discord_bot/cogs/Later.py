@@ -10,6 +10,9 @@ from discord.ext import commands
 from oi_discord_bot.config import *
 from oi_discord_bot.utils import get_role, remove_role
 from oi_discord_bot.onlyimages import tz
+import logging
+logging.basicConfig(format='%(message)s')
+log = logging.getLogger(__name__)
 
 
 class Later(commands.Cog):
@@ -19,11 +22,11 @@ class Later(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         # re-build scheduler with jobs from db lost when bot restarted
-        jobs = db.get_later_delete_jobs()
+        jobs = db.get_all_later_deletion_jobs()
         for job in jobs:
             member_id = job[0]
             remove_time = job[1]
-            print(f"rebuilding later delete job for {member_id} at {remove_time}")
+            logging.warning(f"rebuilding later delete job for {member_id} at {remove_time}")
             scheduler.add_job(
                 self.remove_later_role,
                 DateTrigger(run_date=remove_time),
