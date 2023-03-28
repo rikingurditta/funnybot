@@ -41,8 +41,14 @@ class Later(commands.Cog):
     @app_commands.describe(
         hours="number of hours until role is removed",
     )
-    async def later(self, interaction: Interaction, days: int = 0, hours: int = 1, minutes: int = 0):
+    async def later(self, interaction: Interaction, days: int = 0, hours: int = 0, minutes: int = 0):
         await interaction.response.defer()
+        if days < 0 or hours < 0 or minutes < 0:
+            await interaction.followup.send("no negative numbers allowed!")
+            return
+        if days + hours + minutes == 0:
+            await interaction.followup.send("you must set a duration greater than zero!")
+            return
         user = interaction.user
         role = await get_role(self.client, LATER_ROLE_ID)
         remove_time = tz.normalize(datetime.datetime.now(tz)).astimezone(
