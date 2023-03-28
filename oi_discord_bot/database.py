@@ -9,6 +9,11 @@ DB_NAME = "oi.db"
 
 class OIDatabase:
     def __init__(self):
+        """
+        If you want to make a database change:
+        - Increment LATEST_VERSION
+        - Make your changes and wrap them around an if db_version < <previous version> function
+        """
         self.connection = sqlite3.connect(DB_NAME)
         self.cursor = self.connection.cursor()
         self.cursor.execute(
@@ -62,6 +67,11 @@ class OIDatabase:
         self.connection.commit()
 
     def update_message_count(self, id):
+        """
+        Increment #hi msg count by 1.
+        :param id: user id
+        :return: None
+        """
         self.cursor.execute("SELECT * FROM oi WHERE id = ?", (id,))
         if len(self.cursor.fetchall()) == 0:
             self.cursor.execute("INSERT INTO oi VALUES (?, 1)", (id,))
@@ -72,28 +82,50 @@ class OIDatabase:
         self.connection.commit()
 
     def get_hi_leaderboard(self):
+        """
+        Get ID, message count for users in #hi.
+        :return:
+        """
         self.cursor.execute("SELECT * FROM oi ORDER BY messagecount DESC")
         return self.cursor.fetchall()
 
     def get_cum_leaderboard(self):
+        """
+        Gets all id, emoji, cumcount, crycount from cumcry table, order by cumcount.
+        :return:
+        """
         self.cursor.execute(
             "SELECT id, emoji, cumcount, crycount FROM cumcry ORDER BY cumcount DESC"
         )
         return self.cursor.fetchall()
 
     def get_cry_leaderboard(self):
+        """
+        Gets all id, emoji, cumcount, crycount from cumcry table, order by crycount.
+        :return:
+        """
         self.cursor.execute(
             "SELECT id, emoji, cumcount, crycount FROM cumcry ORDER BY crycount DESC"
         )
         return self.cursor.fetchall()
 
     def get_aggregated_cumcry_leaderboard(self):
+        """
+        Gets all id, emoji, cumcount + crycount from cumcry table, order by cumcount + crycount.
+        :return:
+        """
         self.cursor.execute(
             "SELECT id, emoji, cumcount + crycount FROM cumcry ORDER BY cumcount + crycount DESC, cumcount DESC"
         )
         return self.cursor.fetchall()
 
     def increment_cumcry_count(self, id, action):
+        """
+        Increment cum or cry count for user by 1. If user doesn't exist, creates entry for them with random emoji.
+        :param id: user id
+        :param action: either "cum" or "cry"
+        :return:
+        """
         self.cursor.execute("SELECT * FROM cumcry WHERE id = ?", (id,))
         if len(self.cursor.fetchall()) == 0:
             # choose random emoji from 'Animals & Nature' category
@@ -123,17 +155,26 @@ class OIDatabase:
         self.connection.commit()
 
     def clear_cumcry_counts(self):
+        """
+        Clear all cum and cry counts. Irreversible operation, do not execute.
+        :return:
+        """
         self.cursor.execute("DELETE FROM cumcry")
         self.connection.commit()
 
     def store_confession(self, confession):
+        """
+        Stores confession and hashed confession in database. Returns string to be sent to user.
+        :param confession: confession message in the format "confession <actual confession>"
+        :return: message to send to user with hash
+        """
         confession = confession[len("confess ") :]
         gen_hash = hashlib.sha1(confession.encode("utf-8")).hexdigest()
         h = (
             "Here is the hash for your confession: `"
             + gen_hash
             + '`. If you want to delete your confession, send the following message: "unconfess <hash>" and if deleted '
-            "the oi_discord_bot will react with the trash can emoji."
+            "the oi bot will react with the trash can emoji."
         )
         self.cursor.execute(
             "INSERT INTO confessions VALUES (?, ?)", (confession, gen_hash)
@@ -142,13 +183,28 @@ class OIDatabase:
         return h
 
     def store_wyr(self, wyr):
+        """
+        Stores wyr and hashed wyr in database. Returns hash to be sent to user.
+        :param wyr: wyr message in the format "wyr <actual wyr>"
+        :return: message to send to user with hash
+        """
         wyr = wyr[len("wyr ") :]
-        h = hashlib.sha1(wyr.encode("utf-8")).hexdigest()
+        gen_hash = hashlib.sha1(wyr.encode("utf-8")).hexdigest()
+        h = (
+            "Here is the hash for your wyr: `"
+            + gen_hash
+            + '`. If you want to delete your confession, send the following message: "unwyr <hash>" and if deleted '
+            "the oi bot will react with the trash can emoji."
+        )
         self.cursor.execute("INSERT INTO wyr VALUES (?, ?)", (wyr, h))
         self.connection.commit()
         return h
 
     def get_random_confession(self):
+        """
+        Gets random confession.
+        :return: rowid, confession
+        """
         self.cursor.execute(
             "SELECT rowid, * FROM confessions ORDER BY RANDOM() LIMIT 1"
         )
@@ -161,6 +217,10 @@ class OIDatabase:
         return rowid, confession
 
     def get_random_wyr(self):
+        """
+        Gets random wyr.
+        :return: rowid, wyr
+        """
         self.cursor.execute("SELECT rowid, * FROM wyr ORDER BY RANDOM() LIMIT 1")
         table = self.cursor.fetchall()
         rowid = -1
@@ -171,24 +231,52 @@ class OIDatabase:
         return rowid, wyr
 
     def delete_confession(self, rowid):
+        """
+        Deletes confession by rowid. Use if rowid is knownn.
+        :param rowid:
+        :return:
+        """
         self.cursor.execute("DELETE FROM confessions WHERE rowid = ?", (rowid,))
         self.connection.commit()
 
     def delete_confession_by_hash(self, h):
+        """
+        Deletes confession by hash.
+        :param h: hash
+        :return: number of rows deleted
+        """
         self.cursor.execute("DELETE FROM confessions WHERE hash = ?", (h,))
         num_rows = self.cursor.rowcount
         self.connection.commit()
         return num_rows
 
     def delete_wyr(self, rowid):
+        """
+        Deletes wyr by rowid. Use if rowid is known.
+        :param rowid:
+        :return:
+        """
         self.cursor.execute("DELETE FROM wyr WHERE rowid = ?", (rowid,))
         self.connection.commit()
 
     def delete_wyr_by_hash(self, h):
+        """
+        Deletes wyr by hash.
+        :param h: hash
+        :return: number of rows deleted
+        """
         self.cursor.execute("DELETE FROM wyr WHERE hash = ?", (h,))
+        num_rows = self.cursor.rowcount
         self.connection.commit()
+        return num_rows
 
     def create_later_delete_job(self, member_id, remove_time):
+        """
+        Creates job to remove later role
+        :param member_id: ID of target member
+        :param remove_time: string of datetime object representing remove tim
+        :return:
+        """
         self.cursor.execute(
             "INSERT INTO later_deletion VALUES (?, ?)",
             (
@@ -199,6 +287,12 @@ class OIDatabase:
         self.connection.commit()
 
     def delete_later_delete_job(self, member_id, remove_time):
+        """
+        Deletes job to remove later role from row. Used if job is completed without restart.
+        :param member_id:
+        :param remove_time:
+        :return:
+        """
         self.cursor.execute(
             "DELETE FROM later_deletion WHERE member_id = ? AND remove_time = ?",
             (
@@ -209,16 +303,31 @@ class OIDatabase:
         self.connection.commit()
 
     def get_all_later_deletion_jobs(self):
+        """
+        Gets all later deletion job entries in the db.
+        :return: entries in the form of a list of tuples (member_id, remove_time)
+        """
         self.cursor.execute("SELECT member_id, remove_time FROM later_deletion")
         entries = self.cursor.fetchall()
         return entries
 
     def get_all_cumcry_entries(self):
+        """
+        Gets all cumcry entries in the db.
+        :return: cumcry entries in the form of a list of tuples (id, emoji, cumcount, crycount)
+        """
         self.cursor.execute("SELECT * FROM cumcry")
         entries = self.cursor.fetchall()
         return entries
 
     def update_cumcry_entry(self, id, num_cum, num_cry):
+        """
+        Updates cumcry entry with new cum and cry counts.
+        :param id:
+        :param num_cum:
+        :param num_cry:
+        :return:
+        """
         self.cursor.execute(
             "UPDATE cumcry SET cumcount = ?, crycount = ? WHERE id = ?",
             (num_cum, num_cry, id),
@@ -226,21 +335,47 @@ class OIDatabase:
         self.connection.commit()
 
     def insert_cum_date_entry(self, member_id, date):
+        """
+        Inserts a new cum date entry into the db.
+        :param member_id: ID of member
+        :param date: datetime object or string
+        :return:
+        """
         self.cursor.execute("INSERT INTO cumtime VALUES (?, ?)", (member_id, date))
         self.connection.commit()
 
     def insert_cry_date_entry(self, member_id, date):
+        """
+        Inserts a new cry date entry into the db.
+        :param member_id: ID of member
+        :param date: datetime object or string
+        :return:
+        """
         self.cursor.execute("INSERT INTO crytime VALUES (?, ?)", (member_id, date))
         self.connection.commit()
 
     def count_cum_date_entries_by_id(self, member_id):
-        self.cursor.execute(
-            "SELECT COUNT(*) FROM cumtime WHERE id = ?", (member_id,)
-        )
+        """
+        Counts the number of cum date entries for a given member.
+        :param member_id:
+        :return:
+        """
+        self.cursor.execute("SELECT COUNT(*) FROM cumtime WHERE id = ?", (member_id,))
         return self.cursor.fetchone()[0]
 
     def count_cry_date_entries_by_id(self, member_id):
-        self.cursor.execute(
-            "SELECT COUNT(*) FROM crytime WHERE id = ?", (member_id,)
-        )
+        """
+        Counts the number of cry date entries for a given member.
+        :param member_id:
+        :return:
+        """
+        self.cursor.execute("SELECT COUNT(*) FROM crytime WHERE id = ?", (member_id,))
         return self.cursor.fetchone()[0]
+
+    def get_cumcry_id_emoji_pairs(self):
+        """
+        Gets a dictionary mapping ids to emojis.
+        :return: dictionary of id->emoji pairs. Emojis are given by names, eg. "potted_plant".
+        """
+        self.cursor.execute("SELECT id, emoji FROM cumcry")
+        return dict(self.cursor.fetchall())

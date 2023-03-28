@@ -5,6 +5,12 @@ from datetime import datetime
 
 
 async def get_role(client: commands.Bot, role_id) -> discord.Role:
+    """
+    Gets role from OI guild. Minimizes API calls.
+    :param client:
+    :param role_id:
+    :return:
+    """
     guild = client.get_guild(OI_GUILD_ID)
     if guild is None:
         guild = await client.fetch_guild(OI_GUILD_ID)
@@ -12,6 +18,12 @@ async def get_role(client: commands.Bot, role_id) -> discord.Role:
 
 
 async def get_user(client: commands.Bot, user_id) -> discord.User:
+    """
+    Get user by calling client. Minimizes API calls.
+    :param client:
+    :param user_id:
+    :return:
+    """
     user = client.get_user(user_id)
     if user is None:
         user = await client.fetch_user(user_id)
@@ -19,6 +31,12 @@ async def get_user(client: commands.Bot, user_id) -> discord.User:
 
 
 async def get_channel(client: commands.Bot, channel_id):
+    """
+    Get channel by calling client. Minimizes API calls.
+    :param client:
+    :param channel_id:
+    :return:
+    """
     channel = client.get_channel(channel_id)
     if channel is None:
         channel = await client.fetch_channel(channel_id)
@@ -26,6 +44,12 @@ async def get_channel(client: commands.Bot, channel_id):
 
 
 async def get_guild(client: commands.Bot, guild_id) -> discord.Guild:
+    """
+    Get guild by calling client. Minimizes API calls.
+    :param client:
+    :param guild_id:
+    :return:
+    """
     guild = client.get_guild(guild_id)
     if guild is None:
         guild = await client.fetch_guild(guild_id)
@@ -33,6 +57,13 @@ async def get_guild(client: commands.Bot, guild_id) -> discord.Guild:
 
 
 async def get_member(client: commands.Bot, member_id, guild_id) -> discord.Member:
+    """
+    Get member of guild by calling client. Minimizes API calls.
+    :param client:
+    :param member_id:
+    :param guild_id:
+    :return:
+    """
     guild = await get_guild(client, guild_id)
     member = guild.get_member(member_id)
     if member is None:
@@ -41,22 +72,39 @@ async def get_member(client: commands.Bot, member_id, guild_id) -> discord.Membe
 
 
 async def get_message_by_id(
-    client: commands.Bot, guild_id, channel_id, message_id
+    client: commands.Bot, channel_id, message_id
 ) -> discord.Message:
-    guild = await client.fetch_guild(guild_id)
-    # print(guild)
-    channel = await guild.fetch_channel(channel_id)
+    """
+    Get message by calling client. Minimizes API calls.
+    :param client:
+    :param channel_id:
+    :param message_id:
+    :return:
+    """
+    channel = await get_channel(client, channel_id)
     # print(channel)
     message = await channel.fetch_message(message_id)
     return message
 
 
 async def remove_role(client: commands.Bot, role_id, member_id):
+    """
+    Remove role from member by calling client. Minimizes API calls.
+    :param client:
+    :param role_id:
+    :param member_id:
+    :return:
+    """
     role = await get_role(client, role_id)
     user = await get_member(client, member_id, OI_GUILD_ID)
     await user.remove_roles(role, reason="later timer expired")
 
 
 def datetime_tz_str_to_datetime(datetime_str):
+    """
+    Converts datetime string representation i.e. str(datetime obj) to a datetime object.
+    :param datetime_str: datetime string in the format "%Y-%m-%d %H:%M:%S.%f%z"
+    :return: datetime object representing the datetime string
+    """
     format_string = "%Y-%m-%d %H:%M:%S.%f%z"
     return datetime.strptime(datetime_str, format_string)

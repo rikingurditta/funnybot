@@ -217,8 +217,11 @@ async def process_dm(message):
         await message.reply(h, mention_author=True)
     elif m == "unwyr":
         if len(l) > 1:
-            await message.add_reaction("🗑️")
-            db.delete_wyr_by_hash(l[1])
+            num_rows = db.delete_wyr_by_hash(l[1])
+            if num_rows > 0:
+                await message.add_reaction("🗑️")
+            else:
+                await message.reply("Invalid hash!", mention_author=True)
     else:
         await message.reply(
             "start your message with either `cum`, `cry`, `wyr`, `confess`, `unwyr`, or `unconfess`",
