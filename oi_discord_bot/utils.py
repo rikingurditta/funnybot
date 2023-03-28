@@ -1,6 +1,7 @@
 import discord
 from config import *
 from discord.ext import commands
+from datetime import datetime
 
 
 async def get_role(client: commands.Bot, role_id) -> discord.Role:
@@ -54,3 +55,8 @@ async def remove_role(client: commands.Bot, role_id, member_id):
     role = await get_role(client, role_id)
     user = await get_member(client, member_id, OI_GUILD_ID)
     await user.remove_roles(role, reason="later timer expired")
+
+
+def datetime_tz_str_to_datetime(datetime_str):
+    format_string = "%Y-%m-%d %H:%M:%S.%f%z"
+    return datetime.strptime(datetime_str, format_string)

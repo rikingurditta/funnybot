@@ -8,7 +8,7 @@ from apscheduler.triggers.date import DateTrigger
 from discord import app_commands, Interaction
 from discord.ext import commands
 from oi_discord_bot.config import *
-from oi_discord_bot.utils import get_role, remove_role
+from oi_discord_bot.utils import get_role, remove_role, datetime_tz_str_to_datetime
 from oi_discord_bot.onlyimages import tz
 import logging
 logging.basicConfig(format='%(message)s')
@@ -25,12 +25,12 @@ class Later(commands.Cog):
         jobs = db.get_all_later_deletion_jobs()
         for job in jobs:
             member_id = job[0]
-            remove_time = job[1]
+            remove_time = datetime_tz_str_to_datetime(job[1])
             logging.warning(f"rebuilding later delete job for {member_id} at {remove_time}")
             scheduler.add_job(
                 self.remove_later_role,
                 DateTrigger(run_date=remove_time),
-                args=[member_id, remove_time],
+                args=[member_id, str(remove_time)],
             )
 
     @app_commands.command(
