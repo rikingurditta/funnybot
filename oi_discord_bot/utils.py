@@ -108,3 +108,13 @@ def datetime_tz_str_to_datetime(datetime_str):
     """
     format_string = "%Y-%m-%d %H:%M:%S.%f%z"
     return datetime.strptime(datetime_str, format_string)
+
+
+def id_to_emoji_str(id):
+    """
+    Converts a snowflake id to an emoji string.
+    :param id: user id
+    :return: emoji string
+    """
+    user_dict = db.get_cumcry_id_emoji_pairs()
+    return user_dict[id]
