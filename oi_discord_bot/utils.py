@@ -36,7 +36,7 @@ async def get_member(client: commands.Bot, member_id, guild_id) -> discord.Membe
     guild = await get_guild(client, guild_id)
     member = guild.get_member(member_id)
     if member is None:
-        member = await guild.fetch_member(guild_id)
+        member = await guild.fetch_member(member_id)
     return member
 
 
