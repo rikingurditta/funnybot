@@ -112,7 +112,7 @@ def datetime_tz_str_to_datetime(datetime_str):
 
 def id_to_emoji_str(id):
     """
-    Converts a snowflake id to an emoji string.
+    Converts a cumcry id to an emoji string.
     :param id: user id
     :return: emoji string
     """
