@@ -196,7 +196,7 @@ class OIDatabase:
             + '`. If you want to delete your confession, send the following message: "unwyr <hash>" and if deleted '
             "the oi bot will react with the trash can emoji."
         )
-        self.cursor.execute("INSERT INTO wyr VALUES (?, ?)", (wyr, h))
+        self.cursor.execute("INSERT INTO wyr VALUES (?, ?)", (wyr, gen_hash))
         self.connection.commit()
         return h
 
