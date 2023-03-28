@@ -195,9 +195,11 @@ async def process_dm(message):
     if m == "cum":
         await message.add_reaction(random.choice(CUM_EMOJIS))
         db.increment_cumcry_count(message.author.id, "cum")
+        db.insert_cum_date_entry(message.author.id, message.created_at)
     elif m == "cry":
         await message.add_reaction(random.choice(CRY_EMOJIS))
         db.increment_cumcry_count(message.author.id, "cry")
+        db.insert_cry_date_entry(message.author.id, message.created_at)
     elif m == "confess":
         h = db.store_confession(message.content)
         await message.add_reaction(random.choice(CONFESS_EMOJIS))
