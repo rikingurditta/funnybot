@@ -208,14 +208,14 @@ class CumCry(commands.Cog):
             data = db.get_cry_date_entries_by_id(member.value)
         data = [d[0] for d in data]
         datetime_arr = datetime_str_convert_vectorized(data)
-        log.warning(datetime_arr)
+        log.warning("done datetime conversion")
         num_dates = [date2num(d) for d in datetime_arr]
         histo = np.histogram(num_dates)
         cumulative_histo_counts = histo[0].cumsum()
         plt.plot(histo[1][1:], cumulative_histo_counts)
         plt.gca().xaxis.set_major_formatter(
             ticker.FuncFormatter(
-                lambda numdate, _: num2date(numdate).strftime("%Y-%d-%m")
+                lambda numdate, _: num2date(numdate).strftime("%m-%d-%Y")
             )
         )
         plt.gcf().autofmt_xdate()
