@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 def get_emoji_enum():
     emoji_dict = db.get_cumcry_id_emoji_pairs()
-    emoji_dict = {k: emoji_str_to_emoji(v) for k, v in emoji_dict.items()}
+    emoji_dict = {emoji_str_to_emoji(v): k for k, v in emoji_dict.items()}
     return Enum("Emoji", emoji_dict)
 
 
@@ -198,7 +198,9 @@ class CumCry(commands.Cog):
         mode="which dataset to plot (default is cum)",
         member="which person to target",
     )
-    async def cdf(self, interaction: Interaction, mode: Literal["cum", "cry"], member: Emoji):
+    async def cdf(
+        self, interaction: Interaction, mode: Literal["cum", "cry"], member: Emoji
+    ):
         if mode == "cum":
             data = db.get_cum_date_entries_by_id(member.value)
         else:
