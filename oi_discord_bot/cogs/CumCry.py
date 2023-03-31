@@ -201,6 +201,7 @@ class CumCry(commands.Cog):
     async def cdf(
         self, interaction: Interaction, mode: Literal["cum", "cry"], member: Emoji
     ):
+        await interaction.response.defer()
         if mode == "cum":
             data = db.get_cum_date_entries_by_id(member.value)
         else:

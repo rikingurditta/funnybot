@@ -2,7 +2,6 @@ import discord
 from config import *
 from discord.ext import commands
 from datetime import datetime
-from numba import jit
 import emojis
 
 
@@ -122,11 +121,9 @@ def id_to_emoji_str(id):
     return user_dict[id]
 
 
-@jit(nopython=True)
 def datetime_str_convert_vectorized(str_array):
     """
     Converts an array of string datetime representations to datetime objects.
-    Parallelized using numba.
     :param str_array: Array of strings in the format "%Y-%m-%d %H:%M:%S.%f%z"
     :return: array of datetime objects representing the datetime string
     """
