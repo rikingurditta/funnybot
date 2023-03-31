@@ -128,7 +128,8 @@ def datetime_str_convert_vectorized(str_array):
     :return: array of datetime objects representing the datetime string
     """
     for i in range(len(str_array)):
-        str_array[i] = datetime_tz_str_to_datetime(str_array[i])
+        # sanitizes out the time of day for anonymity
+        str_array[i] = datetime_tz_str_to_datetime(str_array[i]).replace(hour=0, minute=0, second=0, microsecond=0)
 
     return str_array
 
