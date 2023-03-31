@@ -28,7 +28,7 @@ def get_emoji_enum():
     emoji_dict = db.get_cumcry_id_emoji_pairs()
     emojis_only = [emoji_str_to_emoji(v) for k, v in emoji_dict.items()]
     emoji_dict = {emoji_str_to_emoji(v): k for k, v in emoji_dict.items()}
-    return Literal[tuple(emojis_only)], Enum("Emoji", emoji_dict)
+    return Literal[tuple(emojis_only)], emoji_dict
 
 
 Literal_Emojis, emoji_id_map = get_emoji_enum()
