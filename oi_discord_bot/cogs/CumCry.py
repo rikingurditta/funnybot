@@ -206,6 +206,7 @@ class CumCry(commands.Cog):
             data = db.get_cum_date_entries_by_id(member.value)
         else:
             data = db.get_cry_date_entries_by_id(member.value)
+        data = [d[0] for d in data]
         datetime_arr = datetime_str_convert_vectorized(data)
         log.warning(datetime_arr)
         num_dates = [date2num(d) for d in datetime_arr]
