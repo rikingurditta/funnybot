@@ -198,7 +198,7 @@ class CumCry(commands.Cog):
         mode="which dataset to plot (default is cum)",
         member="which person to target",
     )
-    def cdf(self, interaction: Interaction, mode: Literal["cum", "cry"], member: Emoji):
+    async def cdf(self, interaction: Interaction, mode: Literal["cum", "cry"], member: Emoji):
         if mode == "cum":
             data = db.get_cum_date_entries_by_id(member.value)
         else:
