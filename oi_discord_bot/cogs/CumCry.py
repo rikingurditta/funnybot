@@ -204,9 +204,9 @@ class CumCry(commands.Cog):
     ):
         await interaction.response.defer()
         if mode == "cum":
-            data = db.get_cum_date_entries_by_id(emoji_id_map[member.value])
+            data = db.get_cum_date_entries_by_id(emoji_id_map[member])
         else:
-            data = db.get_cry_date_entries_by_id(emoji_id_map[member.value])
+            data = db.get_cry_date_entries_by_id(emoji_id_map[member])
         data = [d[0] for d in data]
         datetime_arr = datetime_str_convert_vectorized(data)
         log.warning("done datetime conversion")
