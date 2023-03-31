@@ -1,14 +1,36 @@
 import logging
 import sys
 import traceback
+from enum import Enum
+from typing import Literal
+
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.dates import date2num, num2date, ticker
 
 sys.path.append("..")
 import discord
 import emojis
 from discord import Interaction, User, app_commands
 from discord.ext import commands
-from oi_discord_bot.utils import get_user
+from oi_discord_bot.utils import (
+    get_user,
+    emoji_str_to_emoji,
+    datetime_str_convert_vectorized,
+)
 from oi_discord_bot.config import *
+
+logging.basicConfig(format="%(message)s")
+log = logging.getLogger(__name__)
+
+
+def get_emoji_enum():
+    emoji_dict = db.get_cumcry_id_emoji_pairs()
+    emoji_dict = {k: emoji_str_to_emoji(v) for k, v in emoji_dict.items()}
+    return Enum("Emoji", emoji_dict)
+
+
+Emoji = get_emoji_enum()
 
 
 class CumCry(commands.Cog):
@@ -166,6 +188,36 @@ class CumCry(commands.Cog):
         #         continue
         # await interaction.followup.send(content=ret_string)
         await interaction.followup.send(content="function disabled")
+
+    @app_commands.command(
+        name="cdf",
+        description="cum/cry distribution function",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    @app_commands.describe(
+        mode="which dataset to plot (default is cum)",
+        member="which person to target",
+    )
+    def cdf(self, interaction: Interaction, mode: Literal["cum", "cry"], member: Emoji):
+        if mode == "cum":
+            data = db.get_cum_date_entries_by_id(member.value)
+        else:
+            data = db.get_cry_date_entries_by_id(member.value)
+        datetime_arr = datetime_str_convert_vectorized(data)
+        log.warning(datetime_arr)
+        num_dates = [date2num(d) for d in datetime_arr]
+        histo = np.histogram(num_dates)
+        cumulative_histo_counts = histo[0].cumsum()
+        plt.plot(histo[1][1:], cumulative_histo_counts)
+        plt.gca().xaxis.set_major_formatter(
+            ticker.FuncFormatter(
+                lambda numdate, _: num2date(numdate).strftime("%Y-%d-%m")
+            )
+        )
+        plt.gcf().autofmt_xdate()
+        plt.savefig("cdf.png")
+        plt.clf()
+        await interaction.followup.send(file=discord.File("cdf.png"))
 
 
 async def setup(bot: commands.Bot) -> None:

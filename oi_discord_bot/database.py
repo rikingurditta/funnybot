@@ -379,3 +379,21 @@ class OIDatabase:
         """
         self.cursor.execute("SELECT id, emoji FROM cumcry")
         return dict(self.cursor.fetchall())
+
+    def get_cum_date_entries_by_id(self, id):
+        """
+        Gets all cum date entries for a given member.
+        :param id: discord member id
+        :return:
+        """
+        self.cursor.execute("SELECT datetime FROM cumtime WHERE id = ?", (id,))
+        return self.cursor.fetchall()
+
+    def get_cry_date_entries_by_id(self, id):
+        """
+        Gets all cry date entries for a given member.
+        :param id: discord member id
+        :return:
+        """
+        self.cursor.execute("SELECT datetime FROM crytime WHERE id = ?", (id,))
+        return self.cursor.fetchall()

@@ -2,6 +2,8 @@ import discord
 from config import *
 from discord.ext import commands
 from datetime import datetime
+from numba import jit
+import emojis
 
 
 async def get_role(client: commands.Bot, role_id) -> discord.Role:
@@ -118,3 +120,26 @@ def id_to_emoji_str(id):
     """
     user_dict = db.get_cumcry_id_emoji_pairs()
     return user_dict[id]
+
+
+@jit(nopython=True)
+def datetime_str_convert_vectorized(str_array):
+    """
+    Converts an array of string datetime representations to datetime objects.
+    Parallelized using numba.
+    :param str_array: Array of strings in the format "%Y-%m-%d %H:%M:%S.%f%z"
+    :return: array of datetime objects representing the datetime string
+    """
+    for i in range(len(str_array)):
+        str_array[i] = datetime_tz_str_to_datetime(str_array[i])
+
+    return str_array
+
+
+def emoji_str_to_emoji(emoji_str):
+    """
+    Converts an emoji string to an emoji object.
+    :param emoji_str: emoji string
+    :return: emoji object
+    """
+    return emojis.encode(":{}:".format(emoji_str))
