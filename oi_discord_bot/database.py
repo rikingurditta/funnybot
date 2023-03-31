@@ -216,6 +216,16 @@ class OIDatabase:
             confession = table[0][1]
         return rowid, confession
 
+    def get_num_confessions(self):
+        """
+        :return: number of entries in confessions table
+        """
+        self.cursor.execute(
+            "SELECT COUNT(1) FROM confessions"
+        )
+        num = self.cursor.fetchall()
+        return num
+
     def get_random_wyr(self):
         """
         Gets random wyr.
@@ -229,6 +239,16 @@ class OIDatabase:
             rowid = table[0][0]
             wyr = table[0][1]
         return rowid, wyr
+
+    def get_num_wyr(self):
+        """
+        :return: number of entries in confessions table
+        """
+        self.cursor.execute(
+            "SELECT COUNT(1) FROM wyr"
+        )
+        num = self.cursor.fetchall()
+        return num
 
     def delete_confession(self, rowid):
         """

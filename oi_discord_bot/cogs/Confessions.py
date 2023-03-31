@@ -55,6 +55,17 @@ class Confessions(commands.Cog):
                 content="confession", embed=Embed(description=confession)
             )
 
+    @app_commands.command(
+        name="numconfessions",
+        description="Number of confessions in db",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+    async def num_confessions(self, interaction: Interaction):
+        await interaction.response.defer()
+        num = db.get_num_confessions()
+        await interaction.followup.send(content=f"{num} confessions in db")
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Confessions(bot))
