@@ -26,11 +26,12 @@ log = logging.getLogger(__name__)
 
 def get_emoji_enum():
     emoji_dict = db.get_cumcry_id_emoji_pairs()
+    emojis_only = [emoji_str_to_emoji(v) for k, v in emoji_dict.items()]
     emoji_dict = {emoji_str_to_emoji(v): k for k, v in emoji_dict.items()}
-    return Enum("Emoji", emoji_dict)
+    return Literal[tuple(emojis_only)], Enum("Emoji", emoji_dict)
 
 
-Emoji = get_emoji_enum()
+Literal_Emojis, emoji_id_map = get_emoji_enum()
 
 
 class CumCry(commands.Cog):
@@ -199,13 +200,13 @@ class CumCry(commands.Cog):
         member="which person to target",
     )
     async def cdf(
-        self, interaction: Interaction, mode: Literal["cum", "cry"], member: Emoji
+        self, interaction: Interaction, mode: Literal["cum", "cry"], member: Literal_Emojis
     ):
         await interaction.response.defer()
         if mode == "cum":
-            data = db.get_cum_date_entries_by_id(member.value)
+            data = db.get_cum_date_entries_by_id(emoji_id_map[member.value])
         else:
-            data = db.get_cry_date_entries_by_id(member.value)
+            data = db.get_cry_date_entries_by_id(emoji_id_map[member.value])
         data = [d[0] for d in data]
         datetime_arr = datetime_str_convert_vectorized(data)
         log.warning("done datetime conversion")
