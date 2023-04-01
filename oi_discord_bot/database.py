@@ -220,9 +220,7 @@ class OIDatabase:
         """
         :return: number of entries in confessions table
         """
-        self.cursor.execute(
-            "SELECT COUNT(1) FROM confessions"
-        )
+        self.cursor.execute("SELECT COUNT(1) FROM confessions")
         num = self.cursor.fetchall()
         return num
 
@@ -244,9 +242,7 @@ class OIDatabase:
         """
         :return: number of entries in confessions table
         """
-        self.cursor.execute(
-            "SELECT COUNT(1) FROM wyr"
-        )
+        self.cursor.execute("SELECT COUNT(1) FROM wyr")
         num = self.cursor.fetchall()
         return num
 

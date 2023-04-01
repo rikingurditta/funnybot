@@ -6,6 +6,7 @@ from apscheduler.triggers.cron import CronTrigger
 from discord import app_commands, Interaction, Embed, TextChannel
 from discord.ext import commands
 from oi_discord_bot.config import *
+from oi_discord_bot.utils import get_channel
 import logging
 
 logging.basicConfig(format="%(message)s")
@@ -43,17 +44,16 @@ class Confessions(commands.Cog):
             )
 
     async def post_confession(self):
-        rowid, confession = db.get_random_confession()
-        if confession == "":
-            return
-        db.delete_confession(rowid)
-        if confession != "":
-            channel: TextChannel = await self.client.fetch_channel(
-                CONFESSIONS_CHANNEL_ID
-            )
-            await channel.send(
-                content="confession", embed=Embed(description=confession)
-            )
+        channel = await get_channel(self.client, GENERAL_CHANNEL_ID)
+        for i in range(CONFESSIONS_PER_DAY):
+            rowid, confession = db.get_random_confession()
+            if confession == "":
+                return
+            db.delete_confession(rowid)
+            if confession != "":
+                await channel.send(
+                    content="confession", embed=Embed(description=confession)
+                )
 
     @app_commands.command(
         name="numconfessions",
@@ -64,7 +64,7 @@ class Confessions(commands.Cog):
     async def num_confessions(self, interaction: Interaction):
         await interaction.response.defer()
         num = db.get_num_confessions()
-        await interaction.followup.send(content=f"{num} confessions in db")
+        await interaction.followup.send(content=f"{num[0][0]} confessions in db")
 
 
 async def setup(bot: commands.Bot) -> None:

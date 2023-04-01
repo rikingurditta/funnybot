@@ -19,7 +19,9 @@ class WYR(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.scheduler.add_job(self.post_wyr, CronTrigger(hour="12", minute="0", second="0"))
+        self.scheduler.add_job(
+            self.post_wyr, CronTrigger(hour="12", minute="0", second="0")
+        )
         self.scheduler.start()
         log.warning("wyr jobs: " + str(self.scheduler.get_jobs()))
 
@@ -64,7 +66,7 @@ class WYR(commands.Cog):
     async def num_wyr(self, interaction: Interaction):
         await interaction.response.defer()
         num = db.get_num_wyr()
-        await interaction.followup.send(content=f"{num} confessions in db")
+        await interaction.followup.send(content=f"{num[0][0]} confessions in db")
 
 
 async def setup(bot: commands.Bot) -> None:
