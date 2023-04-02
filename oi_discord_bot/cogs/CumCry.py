@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import sys
 import traceback
@@ -213,7 +214,9 @@ class CumCry(commands.Cog):
         num_dates = [date2num(d) for d in datetime_arr]
         histo = np.histogram(num_dates)
         cumulative_histo_counts = histo[0].cumsum()
-        plt.plot(histo[1][1:], cumulative_histo_counts)
+        histo = np.append(histo[1], date2num(datetime.now()))
+        cumulative_histo_counts = np.append(cumulative_histo_counts, cumulative_histo_counts[-1])
+        plt.plot(histo[1:], cumulative_histo_counts)
         plt.gca().xaxis.set_major_formatter(
             ticker.FuncFormatter(
                 lambda numdate, _: num2date(numdate).strftime("%m-%d-%Y")
