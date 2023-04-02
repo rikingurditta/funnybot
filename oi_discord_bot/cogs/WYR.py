@@ -59,14 +59,14 @@ class WYR(commands.Cog):
 
     @app_commands.command(
         name="numwyr",
-        description="Number of confessions in db",
+        description="Number of wyrs in db",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
     async def num_wyr(self, interaction: Interaction):
         await interaction.response.defer()
         num = db.get_num_wyr()
-        await interaction.followup.send(content=f"{num[0][0]} confessions in db")
+        await interaction.followup.send(content=f"{num[0][0]} wyrs in db")
 
 
 async def setup(bot: commands.Bot) -> None:
