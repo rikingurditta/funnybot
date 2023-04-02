@@ -93,7 +93,8 @@ class Later(commands.Cog):
 
     @app_commands.command(
         name="unlater",
-        description="remove later role",
+        description="Watch and pray that you may not enter into temptation. The spirit indeed is willing, "
+                    "but the flesh is weak. Matthew 26:41",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     async def unlater(self, interaction: Interaction):
