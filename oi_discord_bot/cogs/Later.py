@@ -91,6 +91,22 @@ class Later(commands.Cog):
         db.delete_later_delete_job(str(user_id), remove_time)
         log.warning(str(self.scheduler.get_jobs()))
 
+    @app_commands.command(
+        name="unlater",
+        description="remove later role",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    async def unlater(self, interaction: Interaction):
+        await interaction.response.defer()
+        user = interaction.user
+        role = await get_role(self.client, LATER_ROLE_ID)
+        if role in user.roles:
+            await remove_role(self.client, LATER_ROLE_ID, user.id)
+            await interaction.followup.send("we're back")
+        else:
+            await interaction.followup.send("you don't have the later role!")
+        db.delete_later_jobs_by_id(str(user.id))
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Later(bot))

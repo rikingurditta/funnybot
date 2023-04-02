@@ -327,6 +327,17 @@ class OIDatabase:
         entries = self.cursor.fetchall()
         return entries
 
+    def delete_later_jobs_by_id(self, user_id):
+        """
+        Deletes all later deletion jobs by user id.
+        :param user_id: target user id
+        :return:
+        """
+        self.cursor.execute(
+            "DELETE FROM later_deletion WHERE member_id = ?", (user_id,)
+        )
+        self.connection.commit()
+
     def get_all_cumcry_entries(self):
         """
         Gets all cumcry entries in the db.

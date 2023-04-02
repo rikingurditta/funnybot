@@ -201,7 +201,10 @@ class CumCry(commands.Cog):
         member="which person to target",
     )
     async def cdf(
-        self, interaction: Interaction, mode: Literal["cum", "cry"], member: Literal_Emojis
+        self,
+        interaction: Interaction,
+        mode: Literal["cum", "cry"],
+        member: Literal_Emojis,
     ):
         await interaction.response.defer()
         if mode == "cum":
@@ -215,7 +218,9 @@ class CumCry(commands.Cog):
         histo = np.histogram(num_dates)
         cumulative_histo_counts = histo[0].cumsum()
         histo = np.append(histo[1], date2num(datetime.now()))
-        cumulative_histo_counts = np.append(cumulative_histo_counts, cumulative_histo_counts[-1])
+        cumulative_histo_counts = np.append(
+            cumulative_histo_counts, cumulative_histo_counts[-1]
+        )
         plt.plot(histo[1:], cumulative_histo_counts)
         plt.gca().xaxis.set_major_formatter(
             ticker.FuncFormatter(
