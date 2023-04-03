@@ -28,7 +28,7 @@ class Confessions(commands.Cog):
 
     @app_commands.command(
         name="forceconfess",
-        description="Force confession to be posted",
+        description="Requires OI bot dev role - Force confession to be posted",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
@@ -57,7 +57,7 @@ class Confessions(commands.Cog):
 
     @app_commands.command(
         name="numconfessions",
-        description="Number of confessions in db",
+        description="Requires OI bot dev role - Number of confessions in db",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)

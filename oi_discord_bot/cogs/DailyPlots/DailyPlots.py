@@ -30,7 +30,7 @@ class DailyPlots(commands.Cog):
 
     @app_commands.command(
         name="forceplot",
-        description="Force rose's daily plot to be posted",
+        description="Requires OI bot dev role - Force rose's daily plot to be posted",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)

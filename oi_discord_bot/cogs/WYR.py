@@ -27,7 +27,7 @@ class WYR(commands.Cog):
 
     @app_commands.command(
         name="forcewyr",
-        description="Force WYR to be posted",
+        description="Requires OI bot dev role - Force WYR to be posted",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
@@ -59,7 +59,7 @@ class WYR(commands.Cog):
 
     @app_commands.command(
         name="numwyr",
-        description="Number of wyrs in db",
+        description="Requires OI bot dev role - Number of wyrs in db",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)

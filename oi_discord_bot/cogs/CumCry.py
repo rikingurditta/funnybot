@@ -136,7 +136,7 @@ class CumCry(commands.Cog):
 
     @app_commands.command(
         name="clearcumcry",
-        description="clear cum/cry records",
+        description="Requires OI bot dev role - clear cum/cry records",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
