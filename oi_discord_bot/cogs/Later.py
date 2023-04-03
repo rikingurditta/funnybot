@@ -70,7 +70,7 @@ class Later(commands.Cog):
 
         # schedule role removal
         await interaction.followup.send(
-            "later! see you at {}".format(
+            "it's over. see you at {}".format(
                 remove_time.replace(tzinfo=pytz.utc).astimezone(tz)
             )
         )
