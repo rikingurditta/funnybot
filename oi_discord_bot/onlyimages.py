@@ -16,6 +16,7 @@ from discord import (
 import pytz
 
 from config import *
+from utils import get_channel
 
 
 tz = pytz.timezone("Canada/Eastern")
@@ -84,15 +85,12 @@ async def on_message(message):
 
 @client.event
 async def on_raw_reaction_add(payload: RawReactionActionEvent):
-    # we do this to limit the amount of API calls we make
-    channel: TextChannel = client.get_channel(payload.channel_id)
-    if channel is None:
-        channel: TextChannel = await client.fetch_channel(payload.channel_id)
-    message: Message = await channel.fetch_message(payload.message_id)
-    reactions = message.reactions
-    print("reaction {}".format(payload.emoji.name))
-
     if payload.emoji.name == "⭐" and payload.channel_id != BESTOF_CHANNEL_ID:
+        # we do this to limit the amount of API calls we make
+        channel: TextChannel = await get_channel(client, payload.channel_id)
+        message: Message = await channel.fetch_message(payload.message_id)
+        reactions = message.reactions
+        print("reaction {}".format(payload.emoji.name))
         for react in reactions:
             if react.emoji == "⭐" and react.count >= STAR_THRESHOLD:
                 if payload.channel_id == HI_CHAT_ID:
@@ -146,7 +144,12 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
                 else:
                     await bestof_channel.send(content=txt, embed=embed)
 
-    elif payload.emoji.name == "👎" and message.channel.name == IMAGES_CHANNEL_NAME:
+    elif payload.emoji.name == "👎" and payload.channel_id == IMAGES_CHANNEL_ID:
+        # we do this to limit the amount of API calls we make
+        channel: TextChannel = await get_channel(client, payload.channel_id)
+        message: Message = await channel.fetch_message(payload.message_id)
+        reactions = message.reactions
+        print("reaction {}".format(payload.emoji.name))
         for react in reactions:
             if react.emoji == "👎" and react.count >= DEL_THRESHOLD:
                 print(f"deleting {DEL_THRESHOLD}x👎")
