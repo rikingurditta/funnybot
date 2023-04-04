@@ -112,10 +112,10 @@ class Later(commands.Cog):
         if role in user.roles:
             await remove_role(self.client, LATER_ROLE_ID, user.id)
             await interaction.followup.send("we're back")
+            db.update_unlater_count(str(user.id))
         else:
             await interaction.followup.send("you don't have the later role!")
         db.delete_later_jobs_by_id(str(user.id))
-        db.update_unlater_count(str(user.id))
 
     @app_commands.command(
         name="unlaterleaderboard",
