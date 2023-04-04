@@ -55,7 +55,11 @@ class OIDatabase:
             self.cursor.execute(
                 "CREATE TABLE IF NOT EXISTS crytime (id TEXT NOT NULL, datetime TEXT NOT NULL)"
             )
-        LATEST_VERSION = 6
+        if db_version < 7:
+            self.cursor.execute(
+                "CREATE TABLE IF NOT EXISTS unlater (id TEXT NOT NULL, cmdcount TEXT NOT NULL)"
+            )
+        LATEST_VERSION = 7
         if db_version == 0:
             self.cursor.execute(
                 "INSERT INTO schema_version VALUES (?)", (LATEST_VERSION,)
@@ -423,4 +427,27 @@ class OIDatabase:
         :return:
         """
         self.cursor.execute("SELECT datetime FROM crytime WHERE id = ?", (id,))
+        return self.cursor.fetchall()
+
+    def update_unlater_count(self, id):
+        """
+        Increment /unlater count by 1.
+        :param id: user id
+        :return: None
+        """
+        self.cursor.execute("SELECT * FROM unlater WHERE id = ?", (id,))
+        if len(self.cursor.fetchall()) == 0:
+            self.cursor.execute("INSERT INTO unlater VALUES (?, 1)", (id,))
+        else:
+            self.cursor.execute(
+                "UPDATE unlater SET cmdcount = cmdcount + 1 WHERE id = ?", (id,)
+            )
+        self.connection.commit()
+
+    def get_unlater_leaderboard(self):
+        """
+        Get ID, call count for /unlater.
+        :return:
+        """
+        self.cursor.execute("SELECT * FROM unlater ORDER BY cmdcount DESC")
         return self.cursor.fetchall()
