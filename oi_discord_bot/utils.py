@@ -154,7 +154,7 @@ def get_platform_info(client):
     Gets info on the current system. Returns it in a nice string.
     :return: string containing platform info
     """
-    ret = "Platform: {}\n".format(platform.system())
+    ret = "```prolog\nPlatform: {}\n".format(platform.system())
 
     # Print the hwid
     if platform.system() == "Windows":
@@ -185,7 +185,8 @@ def get_platform_info(client):
     except:
         git_hash = "Unknown"
     ret += "Git Hash: {}\n".format(git_hash[:7])
-    ret += "Prefix: {}\n".format(client.command_prefix)
+    ret += "Prefixes: {}\n".format(client.command_prefix)
     ret += "Discord SDK Version: {}\n".format(discord.__version__)
-    ret += "Latency: {}ms\n".format(client.latency * 1000)
+    ret += "Latency: {}ms\n".format(round(client.latency * 1000, 2))
+    ret += "```"
     return ret
