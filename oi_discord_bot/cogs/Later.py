@@ -117,29 +117,29 @@ class Later(commands.Cog):
             await interaction.followup.send("you don't have the later role!")
         db.delete_later_jobs_by_id(str(user.id))
 
-    @app_commands.command(
-        name="unlaterleaderboard",
-        description="leaderboard for times /unlater was called",
-    )
-    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
-    async def unlater_leaderboard(self, interaction: Interaction):
-        await interaction.response.defer()
-        table = db.get_unlater_leaderboard()
-        i = 1
-        leaderboard = "/unlater leaderboard\n"
-        unknown_users = []
-        for row in table:
-            try:
-                user: User = self.client.get_user(row[0])
-                if user is None:
-                    user: User = await self.client.fetch_user(row[0])
-            except:
-                unknown_users.append(row[0])
-                continue
-            leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} /unlaters\n"
-            i += 1
-        print(unknown_users)
-        await interaction.followup.send(leaderboard)
+    # @app_commands.command(
+    #     name="unlaterleaderboard",
+    #     description="leaderboard for times /unlater was called",
+    # )
+    # @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    # async def unlater_leaderboard(self, interaction: Interaction):
+    #     await interaction.response.defer()
+    #     table = db.get_unlater_leaderboard()
+    #     i = 1
+    #     leaderboard = "/unlater leaderboard\n"
+    #     unknown_users = []
+    #     for row in table:
+    #         try:
+    #             user: User = self.client.get_user(row[0])
+    #             if user is None:
+    #                 user: User = await self.client.fetch_user(row[0])
+    #         except:
+    #             unknown_users.append(row[0])
+    #             continue
+    #         leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} /unlaters\n"
+    #         i += 1
+    #     print(unknown_users)
+    #     await interaction.followup.send(leaderboard)
 
 
 async def setup(bot: commands.Bot) -> None:

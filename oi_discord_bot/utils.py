@@ -3,6 +3,10 @@ from config import *
 from discord.ext import commands
 from datetime import datetime
 import emojis
+import platform
+import subprocess
+import uuid
+import locale
 
 
 async def get_role(client: commands.Bot, role_id) -> discord.Role:
@@ -129,7 +133,9 @@ def datetime_str_convert_vectorized(str_array):
     """
     for i in range(len(str_array)):
         # sanitizes out the time of day for anonymity
-        str_array[i] = datetime_tz_str_to_datetime(str_array[i]).replace(hour=0, minute=0, second=0, microsecond=0)
+        str_array[i] = datetime_tz_str_to_datetime(str_array[i]).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
 
     return str_array
 
@@ -141,3 +147,45 @@ def emoji_str_to_emoji(emoji_str):
     :return: emoji object
     """
     return emojis.encode(":{}:".format(emoji_str))
+
+
+def get_platform_info(client):
+    """
+    Gets info on the current system. Returns it in a nice string.
+    :return: string containing platform info
+    """
+    ret = "Platform: {}\n".format(platform.system())
+
+    # Print the hwid
+    if platform.system() == "Windows":
+        hwid = (
+            subprocess.check_output("wmic csproduct get uuid")
+            .decode()
+            .split("\n")[1]
+            .strip()
+        )
+    elif platform.system() == "Darwin":
+        hwid = str(uuid.getnode())
+    else:
+        try:
+            with open("/etc/machine-id", "r") as f:
+                hwid = f.read().strip()
+        except:
+            hwid = "Unknown"
+    ret += "HWID: {}\n".format(hwid)
+
+    # Print the language
+    ret += "Language: {}\n".format(locale.getdefaultlocale()[0])
+
+    # Print the current git commit hash
+    try:
+        git_hash = (
+            subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
+        )
+    except:
+        git_hash = "Unknown"
+    ret += "Git Hash: {}\n".format(git_hash[:7])
+    ret += "Prefix: {}\n".format(client.command_prefix)
+    ret += "Discord SDK Version: {}\n".format(discord.__version__)
+    ret += "Latency: {}ms\n".format(client.latency * 1000)
+    return ret
