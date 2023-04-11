@@ -8,6 +8,14 @@ import matplotlib.pyplot as plt
 matplotlib.use("Agg")
 
 from math import floor
+import logging
+
+logging.basicConfig(
+    filename="oi.log",
+    level=logging.DEBUG,
+    format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+)
+log = logging.getLogger(__name__)
 
 dataset_names = [
     "animals",
@@ -610,5 +618,5 @@ def make_daily_graph(filename, bias_filename):
 
         create_plot(names, colours, coords1, coords2, axes1, axes2)
     except Exception as e:
-        print(e)
+        logging.error(e)
         traceback.print_exc()

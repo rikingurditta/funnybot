@@ -16,7 +16,15 @@ from discord import (
 import pytz
 
 from config import *
-from utils import get_channel
+from utils import get_channel, backup_oi_db
+import logging
+
+logging.basicConfig(
+    filename="oi.log",
+    level=logging.DEBUG,
+    format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+)
+log = logging.getLogger(__name__)
 
 
 tz = pytz.timezone("Canada/Eastern")
@@ -24,7 +32,7 @@ tz = pytz.timezone("Canada/Eastern")
 try:
     os.environ["DISCORD_TOKEN"]
 except KeyError:
-    print("no discord token idiot")
+    log.critical("no discord token idiot")
     sys.exit(1)
 
 intents = discord.Intents(
@@ -34,10 +42,17 @@ client = commands.Bot(command_prefix=CMD_PREFIX, intents=intents)
 
 
 async def load_extensions():
-    for cog_file in ["Confessions", "CumCry", "WYR", "Later", "DailyPlots.DailyPlots", "Utils"]:
+    for cog_file in [
+        "Confessions",
+        "CumCry",
+        "WYR",
+        "Later",
+        "DailyPlots.DailyPlots",
+        "Utils",
+    ]:
         try:
             await client.load_extension(f"cogs.{cog_file}")
-            print(f"Loaded extension {cog_file}")
+            log.info(f"Loaded extension {cog_file}")
         except (
             commands.ExtensionNotFound,
             commands.ExtensionAlreadyLoaded,
@@ -45,12 +60,12 @@ async def load_extensions():
             commands.ExtensionFailed,
         ) as e:
             traceback.print_exc()
-            print(f"Could not load extension - {e}")
+            log.error(f"Could not load extension - {e}")
 
 
 @client.event
 async def on_ready():
-    print("We have logged in as {0.user}".format(client))
+    log.info("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
 
 
@@ -61,7 +76,7 @@ async def on_message(message):
 
     if message.channel.id == HI_CHAT_ID:
         db.update_message_count(message.author.id)
-        print(f"deleting {message.id} in 15 minutes")
+        log.info(f"deleting {message.id} in 15 minutes")
         await message.delete(delay=900)
 
     if message.author == client.user:
@@ -75,8 +90,8 @@ async def on_message(message):
         and (message.content != "" or len(message.attachments) == 0)
         and message.channel.name == IMAGES_CHANNEL_NAME
     ):
-        print(f"deleting non only image in #{IMAGES_CHANNEL_NAME}")
-        print(message.channel.name)
+        log.info(f"deleting non only image in #{IMAGES_CHANNEL_NAME}")
+        log.info(message.channel.name)
         await message.delete()
 
     if "\U0001F577" in message.content.lower():
@@ -90,13 +105,13 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
         channel: TextChannel = await get_channel(client, payload.channel_id)
         message: Message = await channel.fetch_message(payload.message_id)
         reactions = message.reactions
-        print("reaction {}".format(payload.emoji.name))
+        log.info("reaction {}".format(payload.emoji.name))
         for react in reactions:
             if react.emoji == "⭐" and react.count >= STAR_THRESHOLD:
                 if payload.channel_id == HI_CHAT_ID:
                     await message.pin()
                     return
-                print(f"starring {STAR_THRESHOLD}x⭐")
+                log.info(f"starring {STAR_THRESHOLD}x⭐")
                 bestof_channel: TextChannel = client.get_channel(BESTOF_CHANNEL_ID)
                 if bestof_channel is None:
                     bestof_channel: TextChannel = await client.fetch_channel(
@@ -149,23 +164,23 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
         channel: TextChannel = await get_channel(client, payload.channel_id)
         message: Message = await channel.fetch_message(payload.message_id)
         reactions = message.reactions
-        print("reaction {}".format(payload.emoji.name))
+        log.info("reaction {}".format(payload.emoji.name))
         for react in reactions:
             if react.emoji == "👎" and react.count >= DEL_THRESHOLD:
-                print(f"deleting {DEL_THRESHOLD}x👎")
+                log.info(f"deleting {DEL_THRESHOLD}x👎")
                 await message.delete()
                 break
 
 
 async def purge_hi_chat():
-    print("purging hi chat")
+    log.info("purging hi chat")
     channel: TextChannel = client.get_channel(HI_CHAT_ID)
     if channel is None:
         channel: TextChannel = await client.fetch_channel(HI_CHAT_ID)
     messages = [m async for m in channel.history(limit=100)]
 
     for msg in messages:
-        print(
+        log.info(
             "msg created at: {}, now: {}, now - 15min: {}".format(
                 msg.created_at.astimezone(pytz.utc),
                 tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc),
@@ -176,7 +191,7 @@ async def purge_hi_chat():
         if msg.created_at.astimezone(pytz.utc) < tz.normalize(
             datetime.datetime.now(tz)
         ).astimezone(pytz.utc) - datetime.timedelta(minutes=15):
-            print(f"deleting {msg.id} through 15 min loop")
+            log.info(f"deleting {msg.id} through 15 min loop")
             await msg.delete()
             sleep(2)
 
@@ -184,6 +199,11 @@ async def purge_hi_chat():
 @tasks.loop(minutes=15)
 async def purge_hi_chat_loop():
     await purge_hi_chat()
+
+
+@tasks.loop(minutes=180)
+async def backup_oi_db_loop():
+    backup_oi_db()
 
 
 async def process_dm(message):

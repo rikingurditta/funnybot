@@ -21,7 +21,11 @@ from oi_discord_bot.utils import (
 )
 from oi_discord_bot.config import *
 
-logging.basicConfig(format="%(message)s")
+logging.basicConfig(
+    filename="oi.log",
+    level=logging.DEBUG,
+    format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+)
 log = logging.getLogger(__name__)
 
 
@@ -60,7 +64,7 @@ class CumCry(commands.Cog):
                 continue
             leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} messages\n"
             i += 1
-        print(unknown_users)
+        log.info("unknown users: " + str(unknown_users))
         await interaction.followup.send(leaderboard)
 
     async def cumcry_leaderboard(self, interaction: Interaction, action):
@@ -91,7 +95,7 @@ class CumCry(commands.Cog):
             else:
                 leaderboard += f"{crytext}\n"
             i += 1
-        print(unknown_users)
+        log.info("unknown users: " + str(unknown_users))
         await interaction.followup.send(leaderboard)
 
     @app_commands.command(
@@ -131,7 +135,7 @@ class CumCry(commands.Cog):
                 continue
             leaderboard += f"#{i:>3}: {emojis.encode(f':{row[1]}:')} - cums and cries: {row[2]:>3}\n"
             i += 1
-        print(unknown_users)
+        log.info("unknown users: " + str(unknown_users))
         await interaction.followup.send(leaderboard)
 
     @app_commands.command(

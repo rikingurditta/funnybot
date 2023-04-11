@@ -12,7 +12,11 @@ from oi_discord_bot.utils import get_role, remove_role, datetime_tz_str_to_datet
 from oi_discord_bot.onlyimages import tz
 import logging
 
-logging.basicConfig(format="%(message)s")
+logging.basicConfig(
+    filename="oi.log",
+    level=logging.DEBUG,
+    format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+)
 log = logging.getLogger(__name__)
 
 
@@ -37,7 +41,7 @@ class Later(commands.Cog):
                 args=[member_id, str(remove_time)],
             )
         self.scheduler.start()
-        log.warning("later jobs: " + str(self.scheduler.get_jobs()))
+        log.info("later jobs: " + str(self.scheduler.get_jobs()))
 
     @app_commands.command(
         name="later",

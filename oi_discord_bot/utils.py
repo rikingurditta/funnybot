@@ -7,6 +7,15 @@ import platform
 import subprocess
 import uuid
 import locale
+import subprocess
+import logging
+
+logging.basicConfig(
+    filename="oi.log",
+    level=logging.DEBUG,
+    format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+)
+log = logging.getLogger(__name__)
 
 
 async def get_role(client: commands.Bot, role_id) -> discord.Role:
@@ -190,3 +199,14 @@ def get_platform_info(client):
     ret += "Latency: {}ms\n".format(round(client.latency * 1000, 2))
     ret += "```"
     return ret
+
+
+def backup_oi_db():
+    """
+    Backs up the database.
+    :return:
+    """
+    try:
+        subprocess.run(OI_DB_BACKUP_COMMAND, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        log.error("Error backing up database: {}".format(e))

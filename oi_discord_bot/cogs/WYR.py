@@ -8,7 +8,11 @@ from discord.ext import commands
 from oi_discord_bot.config import *
 import logging
 
-logging.basicConfig(format="%(message)s")
+logging.basicConfig(
+    filename="oi.log",
+    level=logging.DEBUG,
+    format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+)
 log = logging.getLogger(__name__)
 
 
@@ -23,7 +27,7 @@ class WYR(commands.Cog):
             self.post_wyr, CronTrigger(hour="12", minute="0", second="0")
         )
         self.scheduler.start()
-        log.warning("wyr jobs: " + str(self.scheduler.get_jobs()))
+        log.info("wyr jobs: " + str(self.scheduler.get_jobs()))
 
     @app_commands.command(
         name="forcewyr",

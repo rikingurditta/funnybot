@@ -5,7 +5,8 @@ from oi_discord_bot.config import *
 from .oi_daily_plot_functions import make_daily_graph
 import logging
 
-logging.basicConfig(format="%(message)s")
+logging.basicConfig(filename='oi.log', level=logging.DEBUG, format='%(asctime)s | %(name)s | %(levelname)s | %('
+                                                                   'message)s')
 log = logging.getLogger(__name__)
 
 
