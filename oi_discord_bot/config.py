@@ -2,7 +2,7 @@ from database import OIDatabase
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import asyncio
 import uvloop
-from datetime import datetime
+import datetime
 
 CMD_PREFIX = "="
 STAR_THRESHOLD = 5
@@ -11,7 +11,7 @@ CONFESSIONS_PER_DAY = 2
 IMAGES_CHANNEL_NAME = "images"
 OI_DB_BACKUP_COMMAND = (
     "scp -P 1337 oi.db remilia@10.88.111.37:/mnt/storage/oi_bak/{}.db".format(
-        datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
+        datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     )
 )
 LOG_FILE_NAME = "oi.log"

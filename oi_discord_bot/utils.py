@@ -11,7 +11,7 @@ import subprocess
 import logging
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
     handlers=[
             logging.FileHandler("oi.log"),
@@ -19,7 +19,7 @@ logging.basicConfig(
         ]
 )
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 async def get_role(client: commands.Bot, role_id) -> discord.Role:

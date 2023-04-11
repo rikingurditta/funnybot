@@ -12,7 +12,7 @@ import logging
 
 logging.basicConfig(
     filename="oi.log",
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
 )
 log = logging.getLogger(__name__)

@@ -22,7 +22,7 @@ from oi_discord_bot.utils import (
 from oi_discord_bot.config import *
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
     handlers=[
             logging.FileHandler("oi.log"),
@@ -30,7 +30,7 @@ logging.basicConfig(
         ]
 )
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 
 def get_emoji_enum():
