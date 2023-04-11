@@ -12,3 +12,21 @@ export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
 - run `poetry install`
 - run `poetry shell`
 - cd to `oi_discord_bot` and run `python3 onlyimages.py`
+## contributing
+- use the logging library
+- in new files add the following lines:
+```
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+    handlers=[
+            logging.FileHandler("oi.log"),
+            logging.StreamHandler()
+        ]
+)
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+```
+- use `log.info`, `log.error`, `log.warning` etc
+- format with https://github.com/psf/black
+- use the cogs system by following existing code in the cogs folder
