@@ -36,7 +36,7 @@ class Later(commands.Cog):
         for job in jobs:
             member_id = job[0]
             remove_time = datetime_tz_str_to_datetime(job[1])
-            logging.warning(
+            logging.info(
                 f"rebuilding later delete job for {member_id} at {remove_time}"
             )
             self.scheduler.add_job(
