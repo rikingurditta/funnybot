@@ -22,9 +22,12 @@ from oi_discord_bot.utils import (
 from oi_discord_bot.config import *
 
 logging.basicConfig(
-    filename="oi.log",
     level=logging.DEBUG,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+    handlers=[
+            logging.FileHandler("oi.log"),
+            logging.StreamHandler()
+        ]
 )
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)

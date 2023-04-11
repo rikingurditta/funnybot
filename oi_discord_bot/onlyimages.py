@@ -20,9 +20,12 @@ from utils import get_channel, backup_oi_db
 import logging
 
 logging.basicConfig(
-    filename="oi.log",
     level=logging.DEBUG,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+    handlers=[
+            logging.FileHandler("oi.log"),
+            logging.StreamHandler()
+        ]
 )
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
