@@ -221,7 +221,7 @@ class CumCry(commands.Cog):
             data = db.get_cry_date_entries_by_id(emoji_id_map[member])
         data = [d[0] for d in data]
         datetime_arr = datetime_str_convert_vectorized(data)
-        log.warning("done datetime conversion")
+        log.info("done datetime conversion")
         num_dates = [date2num(d) for d in datetime_arr]
         histo = np.histogram(num_dates)
         cumulative_histo_counts = histo[0].cumsum()

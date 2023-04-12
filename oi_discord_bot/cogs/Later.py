@@ -95,17 +95,17 @@ class Later(commands.Cog):
             DateTrigger(run_date=remove_time),
             args=[user.id, remove_time],
         )
-        log.warning(str(self.scheduler.get_jobs()))
+        log.info(str(self.scheduler.get_jobs()))
         db.create_later_delete_job(str(user.id), remove_time)
 
         # TODO: better followup message
         # TODO: scheduled role addition/removal every night/week night
 
     async def remove_later_role(self, user_id: int, remove_time):
-        log.warning("removing later role for {}".format(user_id))
+        log.info("removing later role for {}".format(user_id))
         await remove_role(self.client, LATER_ROLE_ID, user_id)
         db.delete_later_jobs_by_id(str(user_id))
-        log.warning(str(self.scheduler.get_jobs()))
+        log.info(str(self.scheduler.get_jobs()))
 
     @app_commands.command(
         name="unlater",
