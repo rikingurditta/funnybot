@@ -71,6 +71,7 @@ async def load_extensions():
 async def on_ready():
     log.info("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
+    backup_oi_db_loop.start()
 
 
 @client.event
@@ -205,7 +206,7 @@ async def purge_hi_chat_loop():
     await purge_hi_chat()
 
 
-@tasks.loop(minutes=180)
+@tasks.loop(hours=24)
 async def backup_oi_db_loop():
     backup_oi_db()
 
