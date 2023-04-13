@@ -1,7 +1,7 @@
 import discord
 from config import *
 from discord.ext import commands
-from datetime import datetime
+import datetime
 import emojis
 import platform
 import subprocess
@@ -125,7 +125,7 @@ def datetime_tz_str_to_datetime(datetime_str):
     :return: datetime object representing the datetime string
     """
     format_string = "%Y-%m-%d %H:%M:%S.%f%z"
-    return datetime.strptime(datetime_str, format_string)
+    return datetime.datetime.strptime(datetime_str, format_string)
 
 
 def id_to_emoji_str(id):
