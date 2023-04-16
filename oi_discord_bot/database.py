@@ -59,7 +59,11 @@ class OIDatabase:
             self.cursor.execute(
                 "CREATE TABLE IF NOT EXISTS unlater (id TEXT NOT NULL, cmdcount TEXT NOT NULL)"
             )
-        LATEST_VERSION = 7
+        if db_version < 8:
+            self.cursor.execute(
+                "ALTER TABLE later_deletion ADD COLUMN jobid TEXT NOT NULL"
+            )
+        LATEST_VERSION = 8
         if db_version == 0:
             self.cursor.execute(
                 "INSERT INTO schema_version VALUES (?)", (LATEST_VERSION,)
@@ -290,18 +294,20 @@ class OIDatabase:
         self.connection.commit()
         return num_rows
 
-    def create_later_delete_job(self, member_id, remove_time):
+    def create_later_delete_job(self, member_id, remove_time, jobid):
         """
         Creates job to remove later role
         :param member_id: ID of target member
         :param remove_time: string of datetime object representing remove tim
+        :param jobid: ID of apscheduler job
         :return:
         """
         self.cursor.execute(
-            "INSERT INTO later_deletion VALUES (?, ?)",
+            "REPLACE INTO later_deletion VALUES (?, ?, ?)",
             (
                 member_id,
                 remove_time,
+                jobid,
             ),
         )
         self.connection.commit()
@@ -327,7 +333,18 @@ class OIDatabase:
         Gets all later deletion job entries in the db.
         :return: entries in the form of a list of tuples (member_id, remove_time)
         """
-        self.cursor.execute("SELECT member_id, remove_time FROM later_deletion")
+        self.cursor.execute("SELECT * FROM later_deletion")
+        entries = self.cursor.fetchall()
+        return entries
+
+    def get_later_deletion_jobs_by_id(self, member_id):
+        """
+        Gets all later deletion job entries in the db.
+        :return: entries in the form of a list of tuples (member_id, remove_time)
+        """
+        self.cursor.execute(
+            "SELECT * FROM later_deletion where member_id = ?", (member_id,)
+        )
         entries = self.cursor.fetchall()
         return entries
 

@@ -15,10 +15,7 @@ import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
-    handlers=[
-            logging.FileHandler("oi.log"),
-            logging.StreamHandler()
-        ]
+    handlers=[logging.FileHandler("oi.log"), logging.StreamHandler()],
 )
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -39,11 +36,14 @@ class Later(commands.Cog):
             logging.info(
                 f"rebuilding later delete job for {member_id} at {remove_time}"
             )
-            self.scheduler.add_job(
+            ret_job = self.scheduler.add_job(
                 self.remove_later_role,
                 DateTrigger(run_date=remove_time),
                 args=[member_id, str(remove_time)],
             )
+
+            # updates later deletion job with apscheduler job id
+            db.create_later_delete_job(job[0], job[1], ret_job.id)
         self.scheduler.start()
         log.info("later jobs: " + str(self.scheduler.get_jobs()))
 
@@ -90,13 +90,13 @@ class Later(commands.Cog):
                 remove_time.replace(tzinfo=pytz.utc).astimezone(tz)
             )
         )
-        self.scheduler.add_job(
+        ret_job = self.scheduler.add_job(
             self.remove_later_role,
             DateTrigger(run_date=remove_time),
             args=[user.id, remove_time],
         )
         log.info(str(self.scheduler.get_jobs()))
-        db.create_later_delete_job(str(user.id), remove_time)
+        db.create_later_delete_job(str(user.id), remove_time, ret_job.id)
 
         # TODO: better followup message
         # TODO: scheduled role addition/removal every night/week night
@@ -104,6 +104,10 @@ class Later(commands.Cog):
     async def remove_later_role(self, user_id: int, remove_time):
         log.info("removing later role for {}".format(user_id))
         await remove_role(self.client, LATER_ROLE_ID, user_id)
+        jobs = db.get_later_deletion_jobs_by_id(str(user_id))
+        for job in jobs:
+            log.info("removing job: " + str(job[2]))
+            self.scheduler.remove_job(job[2])
         db.delete_later_jobs_by_id(str(user_id))
         log.info(str(self.scheduler.get_jobs()))
 
@@ -123,6 +127,10 @@ class Later(commands.Cog):
             db.update_unlater_count(str(user.id))
         else:
             await interaction.followup.send("you don't have the later role!")
+        jobs = db.get_later_deletion_jobs_by_id(str(user.id))
+        for job in jobs:
+            log.info("removing job: " + str(job[2]))
+            self.scheduler.remove_job(job[2])
         db.delete_later_jobs_by_id(str(user.id))
 
     # @app_commands.command(
