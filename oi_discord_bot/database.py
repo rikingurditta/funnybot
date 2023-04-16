@@ -60,9 +60,7 @@ class OIDatabase:
                 "CREATE TABLE IF NOT EXISTS unlater (id TEXT NOT NULL, cmdcount TEXT NOT NULL)"
             )
         if db_version < 8:
-            self.cursor.execute(
-                "ALTER TABLE later_deletion ADD COLUMN jobid TEXT"
-            )
+            self.cursor.execute("ALTER TABLE later_deletion ADD COLUMN jobid TEXT")
         LATEST_VERSION = 8
         if db_version == 0:
             self.cursor.execute(
@@ -303,11 +301,13 @@ class OIDatabase:
         :return:
         """
         self.cursor.execute(
-            "REPLACE INTO later_deletion VALUES (?, ?, ?)",
+            "INSERT INTO later_deletion (member_id, remove_time, job_id) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM later_deletion WHERE member_id = ? AND remove_time = ?);",
             (
                 member_id,
                 remove_time,
                 jobid,
+                member_id,
+                remove_time,
             ),
         )
         self.connection.commit()
