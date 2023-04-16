@@ -158,7 +158,7 @@ class Later(commands.Cog):
             except:
                 unknown_users.append(row[0])
                 continue
-            leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} /unlaters\n"
+            leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} unlaters\n"
             i += 1
         log.info("unknown users: {}".format(unknown_users))
         await interaction.followup.send(leaderboard)
