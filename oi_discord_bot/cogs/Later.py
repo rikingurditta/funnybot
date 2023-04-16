@@ -106,8 +106,11 @@ class Later(commands.Cog):
         await remove_role(self.client, LATER_ROLE_ID, user_id)
         jobs = db.get_later_deletion_jobs_by_id(str(user_id))
         for job in jobs:
-            log.info("removing job: " + str(job[2]))
-            self.scheduler.remove_job(job[2])
+            try:
+                log.info("removing job: " + str(job[2]))
+                self.scheduler.remove_job(job[2])
+            except Exception as e:
+                log.warning(e)
         db.delete_later_jobs_by_id(str(user_id))
         log.info(str(self.scheduler.get_jobs()))
 
@@ -129,8 +132,11 @@ class Later(commands.Cog):
             await interaction.followup.send("you don't have the later role!")
         jobs = db.get_later_deletion_jobs_by_id(str(user.id))
         for job in jobs:
-            log.info("removing job: " + str(job[2]))
-            self.scheduler.remove_job(job[2])
+            try:
+                log.info("removing job: " + str(job[2]))
+                self.scheduler.remove_job(job[2])
+            except Exception as e:
+                log.warning(e)
         db.delete_later_jobs_by_id(str(user.id))
 
     # @app_commands.command(
