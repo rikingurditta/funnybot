@@ -301,7 +301,7 @@ class OIDatabase:
         :return:
         """
         self.cursor.execute(
-            "INSERT INTO later_deletion (member_id, remove_time, job_id) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM later_deletion WHERE member_id = ? AND remove_time = ?);",
+            "INSERT INTO later_deletion (member_id, remove_time, jobid) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM later_deletion WHERE member_id = ? AND remove_time = ?);",
             (
                 member_id,
                 remove_time,
