@@ -61,7 +61,7 @@ class OIDatabase:
             )
         if db_version < 8:
             self.cursor.execute(
-                "ALTER TABLE later_deletion ADD COLUMN jobid TEXT NOT NULL"
+                "ALTER TABLE later_deletion ADD COLUMN jobid TEXT"
             )
         LATEST_VERSION = 8
         if db_version == 0:
