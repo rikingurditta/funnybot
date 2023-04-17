@@ -57,7 +57,7 @@ class OIDatabase:
             )
         if db_version < 7:
             self.cursor.execute(
-                "CREATE TABLE IF NOT EXISTS unlater (id TEXT NOT NULL, cmdcount TEXT NOT NULL)"
+                "CREATE TABLE IF NOT EXISTS unlater (id TEXT NOT NULL, cmdcount INT NOT NULL)"
             )
         if db_version < 8:
             self.cursor.execute("ALTER TABLE later_deletion ADD COLUMN jobid TEXT")
