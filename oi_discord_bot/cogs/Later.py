@@ -21,6 +21,15 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 
+def update_later_min_lb(id):
+    latered_time = db.get_last_later_time(id)
+    latered_time = datetime_tz_str_to_datetime(latered_time)
+    now = tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc)
+    diff_min = (now - latered_time).total_seconds() / 60
+    db.update_later_min_count(id, int(diff_min))
+    db.remove_later_time(id)
+
+
 class Later(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -77,9 +86,9 @@ class Later(commands.Cog):
                 return
         except:
             log.warning("interaction returned User, not Member!")
-        remove_time = tz.normalize(datetime.datetime.now(tz)).astimezone(
-            pytz.utc
-        ) + datetime.timedelta(days=days, hours=hours, minutes=minutes)
+        now = tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc)
+        remove_time = now + datetime.timedelta(days=days, hours=hours, minutes=minutes)
+        db.insert_later_time(str(user.id), str(now))
 
         # add role
         await user.add_roles(role, reason="later role requested by user")
@@ -112,6 +121,7 @@ class Later(commands.Cog):
             except Exception as e:
                 log.warning(e)
         db.delete_later_jobs_by_id(str(user_id))
+        update_later_min_lb(str(user_id))
         log.info(str(self.scheduler.get_jobs()))
 
     @app_commands.command(
@@ -138,6 +148,7 @@ class Later(commands.Cog):
             except Exception as e:
                 log.warning(e)
         db.delete_later_jobs_by_id(str(user.id))
+        update_later_min_lb(str(user.id))
 
     @app_commands.command(
         name="unlaterleaderboard",
@@ -159,6 +170,30 @@ class Later(commands.Cog):
                 unknown_users.append(row[0])
                 continue
             leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} unlaters\n"
+            i += 1
+        log.info("unknown users: {}".format(unknown_users))
+        await interaction.followup.send(leaderboard)
+
+    @app_commands.command(
+        name="laterminlb",
+        description="leaderboard for the total time spent in /later",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    async def later_min_lb(self, interaction: Interaction):
+        await interaction.response.defer()
+        table = db.get_later_min_leaderboard()
+        i = 1
+        leaderboard = "time user spent in /later leaderboard\n"
+        unknown_users = []
+        for row in table:
+            try:
+                user: User = self.client.get_user(row[0])
+                if user is None:
+                    user: User = await self.client.fetch_user(row[0])
+            except:
+                unknown_users.append(row[0])
+                continue
+            leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} minutes\n"
             i += 1
         log.info("unknown users: {}".format(unknown_users))
         await interaction.followup.send(leaderboard)

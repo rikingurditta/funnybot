@@ -61,7 +61,14 @@ class OIDatabase:
             )
         if db_version < 8:
             self.cursor.execute("ALTER TABLE later_deletion ADD COLUMN jobid TEXT")
-        LATEST_VERSION = 8
+        if db_version < 9:
+            self.cursor.execute(
+                "CREATE TABLE IF NOT EXISTS later_min (id PRIMARY KEY TEXT NOT NULL, minutes INT NOT NULL)"
+            )
+            self.cursor.execute(
+                "CREATE TABLE IF NOT EXISTS last_latered (id PRIMARY KEY TEXT NOT NULL, datetime TEXT NOT NULL)"
+            )
+        LATEST_VERSION = 9
         if db_version == 0:
             self.cursor.execute(
                 "INSERT INTO schema_version VALUES (?)", (LATEST_VERSION,)
@@ -467,4 +474,70 @@ class OIDatabase:
         :return:
         """
         self.cursor.execute("SELECT * FROM unlater ORDER BY cmdcount DESC")
+        return self.cursor.fetchall()
+
+    def insert_later_time(self, id, curr_time):
+        """
+        Insert into unlater table.
+        :param id: user id
+        :return: None
+        """
+        self.cursor.execute(
+            "INSERT INTO last_latered VALUES (?, ?)",
+            (
+                id,
+                curr_time,
+            ),
+        )
+        self.connection.commit()
+
+    def get_last_later_time(self, id):
+        """
+        Get last time user used /later.
+        :param id: user id
+        :return: Datetime string of last latered time
+        """
+        self.cursor.execute("SELECT last_latered FROM last_latered WHERE id = ?", (id,))
+        return self.cursor.fetchone()[0]
+
+    def remove_later_time(self, id):
+        """
+        Remove last latered time from table.
+        :param id: user id
+        :return: None
+        """
+        self.cursor.execute("DELETE FROM last_latered WHERE id = ?", (id,))
+        self.connection.commit()
+
+    def update_later_min_count(self, id, minutes):
+        """
+        Increment /unlater count by 1.
+        :param id: user id
+        :return: None
+        """
+        self.cursor.execute("SELECT * FROM later_min WHERE id = ?", (id,))
+        if len(self.cursor.fetchall()) == 0:
+            self.cursor.execute(
+                "INSERT INTO later_min VALUES (?, ?)",
+                (
+                    id,
+                    minutes,
+                ),
+            )
+        else:
+            self.cursor.execute(
+                "UPDATE later_min SET minutes = minutes + ? WHERE id = ?",
+                (
+                    minutes,
+                    id,
+                ),
+            )
+        self.connection.commit()
+
+    def get_later_min_leaderboard(self):
+        """
+        Get ID, call count for /unlater.
+        :return:
+        """
+        self.cursor.execute("SELECT * FROM later_min ORDER BY minutes DESC")
         return self.cursor.fetchall()
