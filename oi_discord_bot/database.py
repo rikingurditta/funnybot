@@ -63,10 +63,10 @@ class OIDatabase:
             self.cursor.execute("ALTER TABLE later_deletion ADD COLUMN jobid TEXT")
         if db_version < 9:
             self.cursor.execute(
-                "CREATE TABLE IF NOT EXISTS later_min (id PRIMARY KEY TEXT NOT NULL, minutes INT NOT NULL)"
+                "CREATE TABLE IF NOT EXISTS later_min (id TEXT NOT NULL, minutes INT NOT NULL)"
             )
             self.cursor.execute(
-                "CREATE TABLE IF NOT EXISTS last_latered (id PRIMARY KEY TEXT NOT NULL, datetime TEXT NOT NULL)"
+                "CREATE TABLE IF NOT EXISTS last_latered (id TEXT NOT NULL, datetime TEXT NOT NULL)"
             )
         LATEST_VERSION = 9
         if db_version == 0:
