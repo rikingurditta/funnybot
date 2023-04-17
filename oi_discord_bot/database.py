@@ -498,7 +498,11 @@ class OIDatabase:
         :return: Datetime string of last latered time
         """
         self.cursor.execute("SELECT datetime FROM last_latered WHERE id = ?", (id,))
-        return self.cursor.fetchone()[0]
+        ret = self.cursor.fetchone()
+        if ret is None:
+            return None
+        else:
+            return ret[0]
 
     def remove_later_time(self, id):
         """

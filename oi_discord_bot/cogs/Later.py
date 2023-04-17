@@ -50,6 +50,12 @@ class Later(commands.Cog):
                 DateTrigger(run_date=remove_time),
                 args=[member_id, str(remove_time)],
             )
+            latermin_entry = db.get_last_later_time(member_id)
+            if latermin_entry is None:
+                db.insert_later_time(
+                    member_id,
+                    str(tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc)),
+                )
 
             # updates later deletion job with apscheduler job id
             db.create_later_delete_job(job[0], job[1], ret_job.id)
