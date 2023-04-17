@@ -55,7 +55,7 @@ class CumCry(commands.Cog):
         await interaction.response.defer()
         table = db.get_hi_leaderboard()
         i = 1
-        leaderboard = "#hi chat leaderboard\n"
+        leaderboard = "##hi chat leaderboard\n"
         unknown_users = []
         for row in table:
             try:
@@ -65,7 +65,7 @@ class CumCry(commands.Cog):
             except:
                 unknown_users.append(row[0])
                 continue
-            leaderboard += f"#{i:>3}: **{user.display_name}** - {row[1]} messages\n"
+            leaderboard += f"\#{i:>3}: **{user.display_name}** - {row[1]} messages\n"
             i += 1
         log.info("unknown users: " + str(unknown_users))
         await interaction.followup.send(leaderboard)
@@ -80,7 +80,7 @@ class CumCry(commands.Cog):
         else:
             return
         i = 1
-        leaderboard = f"{action} leaderboard\n"
+        leaderboard = f"##{action} leaderboard\n"
         unknown_users = []
         for row in table:
             try:
@@ -92,7 +92,7 @@ class CumCry(commands.Cog):
                 continue
             cumtext = f"cum: {row[2]:>3}"
             crytext = f"cry: {row[3]:>3}"
-            leaderboard += f"#{i:>3}: {emojis.encode(f':{row[1]}:')} - "
+            leaderboard += f"\#{i:>3}: {emojis.encode(f':{row[1]}:')} - "
             if action == "cum":
                 leaderboard += f"{cumtext}\n"
             else:
@@ -126,7 +126,7 @@ class CumCry(commands.Cog):
         await interaction.response.defer()
         table = db.get_aggregated_cumcry_leaderboard()
         i = 1
-        leaderboard = f"cums and crys leaderboard\n"
+        leaderboard = f"##cums and crys leaderboard\n"
         unknown_users = []
         for row in table:
             try:
@@ -136,7 +136,7 @@ class CumCry(commands.Cog):
             except:
                 unknown_users.append(row[0])
                 continue
-            leaderboard += f"#{i:>3}: {emojis.encode(f':{row[1]}:')} - cums and cries: {row[2]:>3}\n"
+            leaderboard += f"\#{i:>3}: {emojis.encode(f':{row[1]}:')} - cums and cries: {row[2]:>3}\n"
             i += 1
         log.info("unknown users: " + str(unknown_users))
         await interaction.followup.send(leaderboard)
