@@ -55,7 +55,7 @@ class CumCry(commands.Cog):
         await interaction.response.defer()
         table = db.get_hi_leaderboard()
         i = 1
-        leaderboard = "##hi chat leaderboard\n"
+        leaderboard = "## hi chat leaderboard\n"
         unknown_users = []
         for row in table:
             try:
@@ -80,7 +80,7 @@ class CumCry(commands.Cog):
         else:
             return
         i = 1
-        leaderboard = f"##{action} leaderboard\n"
+        leaderboard = f"## {action} leaderboard\n"
         unknown_users = []
         for row in table:
             try:
@@ -126,7 +126,7 @@ class CumCry(commands.Cog):
         await interaction.response.defer()
         table = db.get_aggregated_cumcry_leaderboard()
         i = 1
-        leaderboard = f"##cums and crys leaderboard\n"
+        leaderboard = f"## cums and crys leaderboard\n"
         unknown_users = []
         for row in table:
             try:

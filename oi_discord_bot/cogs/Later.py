@@ -165,7 +165,7 @@ class Later(commands.Cog):
         await interaction.response.defer()
         table = db.get_unlater_leaderboard()
         i = 1
-        leaderboard = "##/unlater leaderboard\n"
+        leaderboard = "## /unlater leaderboard\n"
         unknown_users = []
         for row in table:
             try:
@@ -189,7 +189,7 @@ class Later(commands.Cog):
         await interaction.response.defer()
         table = db.get_later_min_leaderboard()
         i = 1
-        leaderboard = "##time user spent in /later leaderboard\n"
+        leaderboard = "## time user spent in /later leaderboard\n"
         unknown_users = []
         for row in table:
             try:
