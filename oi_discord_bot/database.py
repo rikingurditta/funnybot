@@ -206,7 +206,7 @@ class OIDatabase:
         h = (
             "Here is the hash for your wyr: `"
             + gen_hash
-            + '`. If you want to delete your confession, send the following message: "unwyr <hash>" and if deleted '
+            + '`. If you want to delete your wyr, send the following message: "unwyr <hash>" and if deleted '
             "the oi bot will react with the trash can emoji."
         )
         self.cursor.execute("INSERT INTO wyr VALUES (?, ?)", (wyr, gen_hash))
