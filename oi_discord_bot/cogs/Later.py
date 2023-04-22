@@ -181,7 +181,7 @@ class Later(commands.Cog):
         await interaction.followup.send(leaderboard)
 
     @app_commands.command(
-        name="laterminlb",
+        name="laterboard",
         description="leaderboard for the total time spent in /later",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
