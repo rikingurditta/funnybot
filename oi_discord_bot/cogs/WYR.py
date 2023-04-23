@@ -53,17 +53,18 @@ class WYR(commands.Cog):
                 await message.add_reaction(emoji)
 
     async def post_wyr(self):
-        rowid, wyr = db.get_random_wyr()
-        if wyr == "":
-            return
-        db.delete_wyr(rowid)
-        if wyr != "":
-            channel: TextChannel = await self.client.fetch_channel(WYR_CHANNEL_ID)
-            message = await channel.send(
-                content="Would you rather", embed=Embed(description=wyr)
-            )
-            for emoji in WYR_EMOJIS:
-                await message.add_reaction(emoji)
+        channel: TextChannel = await self.client.fetch_channel(WYR_CHANNEL_ID)
+        for i in range(WYR_PER_DAY):
+            rowid, wyr = db.get_random_wyr()
+            if wyr == "":
+                return
+            db.delete_wyr(rowid)
+            if wyr != "":
+                message = await channel.send(
+                    content="Would you rather", embed=Embed(description=wyr)
+                )
+                for emoji in WYR_EMOJIS:
+                    await message.add_reaction(emoji)
 
     @app_commands.command(
         name="numwyr",

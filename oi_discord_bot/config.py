@@ -8,6 +8,7 @@ CMD_PREFIX = "="
 STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
 CONFESSIONS_PER_DAY = 2
+WYR_PER_DAY = 2
 IMAGES_CHANNEL_NAME = "images"
 OI_DB_BACKUP_COMMAND = (
     "scp -P 1337 oi.db remilia@10.88.111.37:/mnt/storage/oi_bak/{}.db".format(
