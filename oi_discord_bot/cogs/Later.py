@@ -157,7 +157,7 @@ class Later(commands.Cog):
         update_later_min_lb(str(user.id))
 
     @app_commands.command(
-        name="unlaterleaderboard",
+        name="unlaterboard",
         description="leaderboard for times /unlater was called",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
