@@ -22,10 +22,7 @@ import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
-    handlers=[
-            logging.FileHandler("oi.log"),
-            logging.StreamHandler()
-        ]
+    handlers=[logging.FileHandler("oi.log"), logging.StreamHandler()],
 )
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -72,6 +69,7 @@ async def on_ready():
     log.info("We have logged in as {0.user}".format(client))
     purge_hi_chat_loop.start()
     backup_oi_db_loop.start()
+    purge_one_min_loop.start()
 
 
 @client.event
@@ -83,6 +81,10 @@ async def on_message(message):
         db.update_message_count(message.author.id)
         log.info(f"deleting {message.id} in 15 minutes")
         await message.delete(delay=900)
+
+    if message.channel.id == ONE_MIN_CHANNEL_ID:
+        log.info(f"deleting {message.id} in 1 minute")
+        await message.delete(delay=60)
 
     if message.author == client.user:
         return
@@ -204,6 +206,35 @@ async def purge_hi_chat():
 @tasks.loop(minutes=15)
 async def purge_hi_chat_loop():
     await purge_hi_chat()
+
+
+@tasks.loop(minutes=5)
+async def purge_one_min_loop():
+    await purge_one_min()
+
+
+async def purge_one_min():
+    log.info("purging #1-min chat")
+    channel: TextChannel = client.get_channel(ONE_MIN_CHANNEL_ID)
+    if channel is None:
+        channel: TextChannel = await client.fetch_channel(ONE_MIN_CHANNEL_ID)
+    messages = [m async for m in channel.history(limit=100)]
+
+    for msg in messages:
+        log.info(
+            "msg created at: {}, now: {}, now - 1min: {}".format(
+                msg.created_at.astimezone(pytz.utc),
+                tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc),
+                tz.normalize(datetime.datetime.now(tz)).astimezone(pytz.utc)
+                - datetime.timedelta(minutes=1),
+            )
+        )
+        if msg.created_at.astimezone(pytz.utc) < tz.normalize(
+            datetime.datetime.now(tz)
+        ).astimezone(pytz.utc) - datetime.timedelta(minutes=1):
+            log.info(f"deleting {msg.id} in #1-min through 5 min loop")
+            await msg.delete()
+            sleep(2)
 
 
 @tasks.loop(hours=24)
