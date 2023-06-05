@@ -125,7 +125,13 @@ def datetime_tz_str_to_datetime(datetime_str):
     :return: datetime object representing the datetime string
     """
     format_string = "%Y-%m-%d %H:%M:%S.%f%z"
-    return datetime.datetime.strptime(datetime_str, format_string)
+    try:
+        ret = datetime.datetime.strptime(datetime_str, format_string)
+    except ValueError:
+        format_string = "%Y-%m-%d %H:%M:%S%z"
+        ret = datetime.datetime.strptime(datetime_str, format_string)
+        log.warning("Datetime string {} was not in the format %Y-%m-%d %H:%M:%S.%f%z".format(datetime_str))
+    return ret
 
 
 def id_to_emoji_str(id):
