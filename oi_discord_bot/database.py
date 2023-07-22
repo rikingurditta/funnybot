@@ -4,6 +4,19 @@ import sqlite3
 
 import emojis
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
+    handlers=[
+            logging.FileHandler("oi.log"),
+            logging.StreamHandler()
+        ]
+)
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+
 DB_NAME = "oi.db"
 
 
@@ -224,9 +237,11 @@ class OIDatabase:
         table = self.cursor.fetchall()
         rowid = -1
         confession = ""
+        log.info(f"Fetched {len(table)} of {self.get_num_confessions()} confessions")
         if len(table) > 0:
             rowid = table[0][0]
             confession = table[0][1]
+            log.info(f"Confession {rowid}: \"{confession}\"")
         return rowid, confession
 
     def get_num_confessions(self):
