@@ -248,6 +248,6 @@ def read_oi_log(num_lines):
     try:
         with open(LOG_FILE_NAME, "r") as f:
             lines = f.readlines()
-            return lines[-num_lines:]
+            return "\n".join(lines[-num_lines:])
     except FileNotFoundError:
         return ["Log file not found."]
