@@ -194,6 +194,8 @@ class OIDatabase:
         :param confession: confession message in the format "confession <actual confession>"
         :return: message to send to user with hash
         """
+        if confession.strip() == "":
+            return "you can't confess nothing, dummy"
         confession = confession[len("confess ") :]
         gen_hash = hashlib.sha1(confession.encode("utf-8")).hexdigest()
         h = (
@@ -236,7 +238,7 @@ class OIDatabase:
         )
         table = self.cursor.fetchall()
         rowid = -1
-        confession = ""
+        confession = None
         log.info(f"Fetched {len(table)} of {self.get_num_confessions()} confessions")
         if len(table) > 0:
             rowid = table[0][0]

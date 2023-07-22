@@ -43,7 +43,7 @@ class Confessions(commands.Cog):
     async def force_confess(self, interaction: Interaction):
         await interaction.response.defer()
         rowid, confession = db.get_random_confession()
-        if confession == "":
+        if confession is None:
             await interaction.followup.send(content="no confessions")
         else:
             db.delete_confession(rowid)
@@ -55,10 +55,10 @@ class Confessions(commands.Cog):
         channel = await get_channel(self.client, GENERAL_CHANNEL_ID)
         for i in range(CONFESSIONS_PER_DAY):
             rowid, confession = db.get_random_confession()
-            if confession == "":
+            if confession is None:
                 return
             db.delete_confession(rowid)
-            if confession != "":
+            if confession is not None:
                 await channel.send(
                     content="confession", embed=Embed(description=confession)
                 )
