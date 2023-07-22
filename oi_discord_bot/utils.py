@@ -1,3 +1,5 @@
+import os
+
 import discord
 from config import *
 from discord.ext import commands
@@ -13,10 +15,7 @@ import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
-    handlers=[
-            logging.FileHandler("oi.log"),
-            logging.StreamHandler()
-        ]
+    handlers=[logging.FileHandler("oi.log"), logging.StreamHandler()],
 )
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -130,7 +129,11 @@ def datetime_tz_str_to_datetime(datetime_str):
     except ValueError:
         format_string = "%Y-%m-%d %H:%M:%S%z"
         ret = datetime.datetime.strptime(datetime_str, format_string)
-        log.warning("Datetime string {} was not in the format %Y-%m-%d %H:%M:%S.%f%z".format(datetime_str))
+        log.warning(
+            "Datetime string {} was not in the format %Y-%m-%d %H:%M:%S.%f%z".format(
+                datetime_str
+            )
+        )
     return ret
 
 
@@ -220,3 +223,31 @@ def backup_oi_db():
         subprocess.run(OI_DB_BACKUP_COMMAND, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         log.error("Error backing up database: {}".format(e))
+
+
+def backup_oi_log():
+    """
+    Backs up the database.
+    :return:
+    """
+    try:
+        subprocess.run(OI_LOG_BACKUP_COMMAND, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        log.error("Error backing up logs: {}".format(e))
+    log_file_stats = os.stat(LOG_FILE_NAME)
+    if log_file_stats.st_size > LOG_FILE_SIZE_LIMIT:
+        os.remove(LOG_FILE_NAME)
+        log.info("Removed log file due to size limit.")
+
+
+def read_oi_log(num_lines):
+    """
+    Reads the last num_lines of the log file.
+    :return:
+    """
+    try:
+        with open(LOG_FILE_NAME, "r") as f:
+            lines = f.readlines()
+            return lines[-num_lines:]
+    except FileNotFoundError:
+        return ["Log file not found."]

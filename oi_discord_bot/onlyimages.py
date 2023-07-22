@@ -16,7 +16,7 @@ from discord import (
 import pytz
 
 from config import *
-from utils import get_channel, backup_oi_db
+from utils import get_channel, backup_oi_db, backup_oi_log
 import logging
 
 logging.basicConfig(
@@ -240,6 +240,11 @@ async def purge_one_min():
 @tasks.loop(hours=24)
 async def backup_oi_db_loop():
     backup_oi_db()
+
+
+@tasks.loop(hours=48)
+async def backup_oi_log_loop():
+    backup_oi_log()
 
 
 async def process_dm(message):

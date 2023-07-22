@@ -3,7 +3,7 @@ import sys
 import discord
 from discord import app_commands, Interaction
 from oi_discord_bot.config import *
-from oi_discord_bot.utils import get_platform_info
+from oi_discord_bot.utils import get_platform_info, read_oi_log
 
 sys.path.append("..")
 from discord.ext import commands
@@ -12,10 +12,7 @@ import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
-    handlers=[
-            logging.FileHandler("oi.log"),
-            logging.StreamHandler()
-        ]
+    handlers=[logging.FileHandler("oi.log"), logging.StreamHandler()],
 )
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -34,6 +31,17 @@ class Utils(commands.Cog):
     async def unlater_leaderboard(self, interaction: Interaction):
         await interaction.response.defer()
         info_str = get_platform_info(self.client)
+        await interaction.followup.send(content=info_str)
+
+    @app_commands.command(
+        name="get_logs",
+        description="get last lines of bot log file",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+    async def unlater_leaderboard(self, interaction: Interaction, lines: int = 20):
+        await interaction.response.defer()
+        info_str = "```\n" + read_oi_log(lines) + "\n```"
         await interaction.followup.send(content=info_str)
 
 

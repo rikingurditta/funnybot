@@ -15,7 +15,13 @@ OI_DB_BACKUP_COMMAND = (
         datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     )
 )
+OI_LOG_BACKUP_COMMAND = (
+    "scp -P 1337 oi.log remilia@10.88.111.37:/mnt/storage/oi_bak/{}.log".format(
+        datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
+    )
+)
 LOG_FILE_NAME = "oi.log"
+LOG_FILE_SIZE_LIMIT = 1024 * 1024  # 1 MB
 
 OI_GUILD_ID = 961028480189992970
 GENERAL_CHANNEL_ID = 1032482385205415947
