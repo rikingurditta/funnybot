@@ -41,7 +41,7 @@ class Utils(commands.Cog):
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
     async def unlater_leaderboard(self, interaction: Interaction, lines: int = 20):
         await interaction.response.defer()
-        info_str = "```" + read_oi_log(lines) + "\n```"
+        info_str = "```prolog\n" + read_oi_log(lines) + "\n```"
         await interaction.followup.send(content=info_str)
 
 
