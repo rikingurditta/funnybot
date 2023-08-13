@@ -42,6 +42,8 @@ OI_BOT_DEV_IDS = [
     381994860523159562,
 ]
 
+ENABLE_CONFESSIONS = False
+
 
 CUM_EMOJIS = ["💦", "🥵", "🤢", "🥛", "😋"]
 CRY_EMOJIS = ["😢", "🫂", "😭", "😔", "☹️"]

@@ -265,16 +265,28 @@ async def process_dm(message):
         db.increment_cumcry_count(message.author.id, "cry")
         db.insert_cry_date_entry(message.author.id, message.created_at)
     elif m == "confess":
-        h = db.store_confession(message.content)
-        await message.add_reaction(random.choice(CONFESS_EMOJIS))
-        await message.reply(h, mention_author=True)
+        if ENABLE_CONFESSIONS:
+            h = db.store_confession(message.content)
+            await message.add_reaction(random.choice(CONFESS_EMOJIS))
+            await message.reply(h, mention_author=True)
+        else:
+            await message.reply(
+                "it's over. no more confessions <:cryer:997566397364314253>",
+                mention_author=True,
+            )
     elif m == "unconfess":
-        if len(l) > 1:
-            num_rows = db.delete_confession_by_hash(l[1])
-            if num_rows > 0:
-                await message.add_reaction("🗑️")
-            else:
-                await message.reply("Invalid hash!", mention_author=True)
+        if ENABLE_CONFESSIONS:
+            if len(l) > 1:
+                num_rows = db.delete_confession_by_hash(l[1])
+                if num_rows > 0:
+                    await message.add_reaction("🗑️")
+                else:
+                    await message.reply("Invalid hash!", mention_author=True)
+        else:
+            await message.reply(
+                "it's over. no more confessions <:cryer:997566397364314253>",
+                mention_author=True,
+            )
     elif m == "wyr":
         h = db.store_wyr(message.content)
         await message.add_reaction(random.choice(WYR_REACT_EMOJIS))
