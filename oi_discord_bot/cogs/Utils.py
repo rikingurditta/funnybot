@@ -28,7 +28,7 @@ class Utils(commands.Cog):
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
-    async def bot_info(self, interaction: Interaction):
+    async def get_info(self, interaction: Interaction):
         await interaction.response.defer()
         info_str = get_platform_info(self.client)
         await interaction.followup.send(content=info_str)
