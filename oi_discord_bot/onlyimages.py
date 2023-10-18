@@ -1,3 +1,4 @@
+import re
 import traceback
 from time import sleep
 import datetime
@@ -72,8 +73,41 @@ async def on_ready():
     purge_one_min_loop.start()
 
 
+loss_regex = re.compile(r"Ooh, sorry (.*), it was [a-z]+?\.")
+win_regex = re.compile(r"Correct, (.*), it was [a-z]+?\.")
+
+
 @client.event
 async def on_message(message):
+    if message.author.id == SIGMA_BOT_ID:
+        if len(message.embeds) > 0:
+            embed_dict = message.embeds[0].to_dict()
+            if "title" in embed_dict:
+                loss_results = loss_regex.findall(embed_dict["title"])
+                win_results = win_regex.findall(embed_dict["title"])
+                hangman_member = None
+                win = False
+                if len(loss_results) > 0:
+                    hangman_member = message.guild.fetch_member(loss_results[0])
+                    if hangman_member is None:
+                        log.error(
+                            "could not find hangman member {}".format(
+                                message.author.name
+                            )
+                        )
+                elif len(win_results) > 0:
+                    hangman_member = message.guild.fetch_member(win_results[0])
+                    if hangman_member is None:
+                        log.error(
+                            "could not find hangman member {}".format(
+                                message.author.name
+                            )
+                        )
+                    win = True
+                if hangman_member is not None:
+                    if len(loss_results) > 0 or len(win_results) > 0:
+                        db.increment_hangman_lb(hangman_member.id, win)
+
     if "cum" in message.content.lower():
         await message.add_reaction("<:lfg:961074481219117126>")
 

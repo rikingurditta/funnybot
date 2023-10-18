@@ -9,10 +9,7 @@ import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
-    handlers=[
-            logging.FileHandler("oi.log"),
-            logging.StreamHandler()
-        ]
+    handlers=[logging.FileHandler("oi.log"), logging.StreamHandler()],
 )
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -81,7 +78,11 @@ class OIDatabase:
             self.cursor.execute(
                 "CREATE TABLE IF NOT EXISTS last_latered (id TEXT NOT NULL, datetime TEXT NOT NULL)"
             )
-        LATEST_VERSION = 9
+        if db_version < 10:
+            self.cursor.execute(
+                "CREATE TABLE IF NOT EXISTS hangman_lb (id TEXT NOT NULL, wins INT NOT NULL, losses INT NOT NULL)"
+            )
+        LATEST_VERSION = 10
         if db_version == 0:
             self.cursor.execute(
                 "INSERT INTO schema_version VALUES (?)", (LATEST_VERSION,)
@@ -243,7 +244,7 @@ class OIDatabase:
         if len(table) > 0:
             rowid = table[0][0]
             confession = table[0][1]
-            log.info(f"Confession {rowid}: \"{confession}\"")
+            log.info(f'Confession {rowid}: "{confession}"')
         return rowid, confession
 
     def get_num_confessions(self):
@@ -561,4 +562,44 @@ class OIDatabase:
         :return:
         """
         self.cursor.execute("SELECT * FROM later_min ORDER BY minutes DESC")
+        return self.cursor.fetchall()
+
+    def increment_hangman_lb(self, id, outcome):
+        """
+        Increment hangman win or loss count by 1.
+        :param id: user id
+        :param outcome: True = win, False = loss
+        :return:
+        """
+        self.cursor.execute("SELECT * FROM hangman_lb WHERE id = ?", (id,))
+        if len(self.cursor.fetchall()) == 0:
+            wins = 1 if outcome else 0
+            losses = 0 if outcome else 1
+            self.cursor.execute(
+                "INSERT INTO hangman_lb VALUES (?, ?, ?)",
+                (
+                    id,
+                    wins,
+                    losses,
+                ),
+            )
+        else:
+            if outcome:
+                self.cursor.execute(
+                    "UPDATE hangman_lb SET wins = wins + 1 WHERE id = ?",
+                    (id,),
+                )
+            else:
+                self.cursor.execute(
+                    "UPDATE hangman_lb SET losses = losses + 1 WHERE id = ?",
+                    (id,),
+                )
+        self.connection.commit()
+
+    def get_hangman_lb(self):
+        """
+        Get ID, message count for users in #hi.
+        :return:
+        """
+        self.cursor.execute("SELECT * FROM hangman_lb ORDER BY wins DESC")
         return self.cursor.fetchall()

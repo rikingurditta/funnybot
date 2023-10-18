@@ -23,10 +23,7 @@ from oi_discord_bot.config import *
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(name)s | %(levelname)s | %(" "message)s",
-    handlers=[
-            logging.FileHandler("oi.log"),
-            logging.StreamHandler()
-        ]
+    handlers=[logging.FileHandler("oi.log"), logging.StreamHandler()],
 )
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -66,6 +63,30 @@ class CumCry(commands.Cog):
                 unknown_users.append(row[0])
                 continue
             leaderboard += f"\#{i:>3}: **{user.display_name}** - {row[1]} messages\n"
+            i += 1
+        log.info("unknown users: " + str(unknown_users))
+        await interaction.followup.send(leaderboard)
+
+    @app_commands.command(
+        name="hangman_leaderboard",
+        description="leaderboard for sigma hangman wins",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    async def hangman_leaderboard(self, interaction: Interaction):
+        await interaction.response.defer()
+        table = db.get_hangman_lb()
+        i = 1
+        leaderboard = "## hangman winners leaderboard\n"
+        unknown_users = []
+        for row in table:
+            try:
+                user: User = self.client.get_user(row[0])
+                if user is None:
+                    user: User = await self.client.fetch_user(row[0])
+            except:
+                unknown_users.append(row[0])
+                continue
+            leaderboard += f"\#{i:>3}: **{user.display_name}** - {row[1]} wins\n"
             i += 1
         log.info("unknown users: " + str(unknown_users))
         await interaction.followup.send(leaderboard)
