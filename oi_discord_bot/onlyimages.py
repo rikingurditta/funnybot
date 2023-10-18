@@ -88,7 +88,7 @@ async def on_message(message):
                 hangman_member = None
                 win = False
                 if len(loss_results) > 0:
-                    hangman_member = message.guild.fetch_member(loss_results[0])
+                    hangman_member = message.guild.get_member_named(loss_results[0])
                     if hangman_member is None:
                         log.error(
                             "could not find hangman member {}".format(
@@ -96,7 +96,7 @@ async def on_message(message):
                             )
                         )
                 elif len(win_results) > 0:
-                    hangman_member = message.guild.fetch_member(win_results[0])
+                    hangman_member = message.guild.get_member_named(win_results[0])
                     if hangman_member is None:
                         log.error(
                             "could not find hangman member {}".format(
