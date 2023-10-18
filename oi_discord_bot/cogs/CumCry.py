@@ -79,6 +79,9 @@ class CumCry(commands.Cog):
         leaderboard = "## hangman winners leaderboard\n"
         unknown_users = []
         for row in table:
+            if row[1] == 0:
+                # skip players with 0 wins
+                continue
             try:
                 user: User = self.client.get_user(row[0])
                 if user is None:
