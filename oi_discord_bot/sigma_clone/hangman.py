@@ -183,10 +183,12 @@ async def hangman(bot, db, message, funny=False):
         if gallows.dead:
             lose_title = f"💥 Ooh, sorry {author}, it was {gallows.word}."
             final_embed = discord.Embed(color=0xFF3300, title=lose_title)
-            db.increment_hangman_lb(message.author.id, False)
+            if not funny:
+                db.increment_hangman_lb(message.author.id, False)
             await message.channel.send(embed=final_embed)
         elif gallows.victory:
-            db.increment_hangman_lb(message.author.id, True)
+            if not funny:
+                db.increment_hangman_lb(message.author.id, True)
             win_title = f"🎉 Correct, {author}, it was {gallows.word}!"
             win_embed = discord.Embed(color=0x77B255, title=win_title)
             await message.channel.send(embed=win_embed)
