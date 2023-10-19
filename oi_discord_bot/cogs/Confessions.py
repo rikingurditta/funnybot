@@ -6,7 +6,7 @@ from apscheduler.triggers.cron import CronTrigger
 from discord import app_commands, Interaction, Embed, TextChannel
 from discord.ext import commands
 from oi_discord_bot.config import *
-from oi_discord_bot.utils import get_channel
+from oi_discord_bot.oi_utils import get_channel
 import logging
 
 logging.basicConfig(

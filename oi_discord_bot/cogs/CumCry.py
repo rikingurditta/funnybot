@@ -13,7 +13,7 @@ import discord
 import emojis
 from discord import Interaction, User, app_commands
 from discord.ext import commands
-from oi_discord_bot.utils import (
+from oi_discord_bot.oi_utils import (
     get_user,
     emoji_str_to_emoji,
     datetime_str_convert_vectorized,

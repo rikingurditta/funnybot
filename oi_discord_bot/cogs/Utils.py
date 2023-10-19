@@ -3,7 +3,7 @@ import sys
 import discord
 from discord import app_commands, Interaction
 from oi_discord_bot.config import *
-from oi_discord_bot.utils import get_platform_info, read_oi_log
+from oi_discord_bot.oi_utils import get_platform_info, read_oi_log
 
 sys.path.append("..")
 from discord.ext import commands

@@ -21,9 +21,9 @@ import secrets
 import random
 import discord
 
-from generic_responses import GenericResponse
-from gallows_core import Gallows
-from ongoing import Ongoing
+from sigma_clone.generic_responses import GenericResponse
+from sigma_clone.gallows_core import Gallows
+from sigma_clone.ongoing import Ongoing
 from wiktionaryparser import WiktionaryParser
 import logging
 

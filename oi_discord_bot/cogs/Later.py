@@ -8,7 +8,7 @@ from apscheduler.triggers.date import DateTrigger
 from discord import app_commands, Interaction, User
 from discord.ext import commands
 from oi_discord_bot.config import *
-from oi_discord_bot.utils import get_role, remove_role, datetime_tz_str_to_datetime
+from oi_discord_bot.oi_utils import get_role, remove_role, datetime_tz_str_to_datetime
 from oi_discord_bot.onlyimages import tz
 import logging
 
