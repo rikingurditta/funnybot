@@ -617,12 +617,12 @@ class OIDatabase:
         """
         if (
             self.cursor.execute(
-                "SELECT * FROM dictionary WHERE word = ?", (word,)
+                "SELECT * FROM funny_words WHERE word = ?", (word,)
             ).fetchone()
             is None
         ):
             self.cursor.execute(
-                "INSERT INTO dictionary VALUES (?, ?)", (word, definition)
+                "INSERT INTO funny_words VALUES (?, ?)", (word, definition)
             )
             self.connection.commit()
             return True
@@ -635,7 +635,7 @@ class OIDatabase:
         :param word: word to remove
         :return:
         """
-        self.cursor.execute("DELETE FROM dictionary WHERE word = ?", (word,))
+        self.cursor.execute("DELETE FROM funny_words WHERE word = ?", (word,))
         self.connection.commit()
 
     def get_random_word(self):
@@ -643,5 +643,5 @@ class OIDatabase:
         Get random word from dictionary.
         :return:
         """
-        self.cursor.execute("SELECT * FROM dictionary ORDER BY RANDOM() LIMIT 1")
+        self.cursor.execute("SELECT * FROM funny_words ORDER BY RANDOM() LIMIT 1")
         return self.cursor.fetchone()
