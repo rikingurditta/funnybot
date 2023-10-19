@@ -82,7 +82,11 @@ class OIDatabase:
             self.cursor.execute(
                 "CREATE TABLE IF NOT EXISTS hangman_lb (id TEXT NOT NULL, wins INT NOT NULL, losses INT NOT NULL)"
             )
-        LATEST_VERSION = 10
+        if db_version < 11:
+            self.cursor.execute(
+                "CREATE TABLE IF NOT EXISTS funny_words (word TEXT NOT NULL, definition TEXT NOT NULL)"
+            )
+        LATEST_VERSION = 11
         if db_version == 0:
             self.cursor.execute(
                 "INSERT INTO schema_version VALUES (?)", (LATEST_VERSION,)
@@ -603,3 +607,41 @@ class OIDatabase:
         """
         self.cursor.execute("SELECT * FROM hangman_lb ORDER BY wins DESC")
         return self.cursor.fetchall()
+
+    def insert_new_word(self, word, definition):
+        """
+        Insert new word into dictionary.
+        :param word: word to insert
+        :param definition: definition of word
+        :return:
+        """
+        if (
+            self.cursor.execute(
+                "SELECT * FROM dictionary WHERE word = ?", (word,)
+            ).fetchone()
+            is None
+        ):
+            self.cursor.execute(
+                "INSERT INTO dictionary VALUES (?, ?)", (word, definition)
+            )
+            self.connection.commit()
+            return True
+        else:
+            return False
+
+    def remove_word(self, word):
+        """
+        Remove word from dictionary.
+        :param word: word to remove
+        :return:
+        """
+        self.cursor.execute("DELETE FROM dictionary WHERE word = ?", (word,))
+        self.connection.commit()
+
+    def get_random_word(self):
+        """
+        Get random word from dictionary.
+        :return:
+        """
+        self.cursor.execute("SELECT * FROM dictionary ORDER BY RANDOM() LIMIT 1")
+        return self.cursor.fetchone()

@@ -44,6 +44,31 @@ class Utils(commands.Cog):
         info_str = "```prolog\n" + read_oi_log(lines) + "\n```"
         await interaction.followup.send(content=info_str)
 
+    @app_commands.command(
+        name="insert_word",
+        description="insert word and definition into custom hangman db",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+    async def insert_word(self, interaction: Interaction, word: str, definition: str):
+        await interaction.response.defer()
+        ret = db.insert_new_word(word, definition)
+        if ret:
+            await interaction.followup.send(content=f"Inserted {word} into db with definition {definition}.")
+        else:
+            await interaction.followup.send(content=f"Failed to insert {word} into db (word already exists).")
+
+    @app_commands.command(
+        name="delete_word",
+        description="delete word from custom hangman db",
+    )
+    @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
+    @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
+    async def delete_word(self, interaction: Interaction, word: str):
+        await interaction.response.defer()
+        db.remove_word(word)
+        await interaction.followup.send(content=f"Deleted {word} from db.")
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Utils(bot))
