@@ -113,10 +113,10 @@ async def send_hangman_msg(message, hangman_msg, hangman_resp):
     return hangman_msg
 
 
-async def hangman(bot, db, message):
+async def hangman(bot, db, message, funny=False):
     if not Ongoing.is_ongoing(NAME, message.channel.id):
         Ongoing.set_ongoing(NAME, message.channel.id)
-        if random.random() > 0.01:
+        if random.random() > 0.01 and not funny:
             word = secrets.choice(english_words)
             word_description = get_definition(word)
         else:

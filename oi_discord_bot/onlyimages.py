@@ -78,6 +78,8 @@ async def on_ready():
 async def on_message(message):
     if message.content == "==hangman":
         await hangman(client, db, message)
+    elif message.content == "==hangmanfunny":
+        await hangman(client, db, message, funny=True)
 
     if "cum" in message.content.lower():
         await message.add_reaction("<:lfg:961074481219117126>")
