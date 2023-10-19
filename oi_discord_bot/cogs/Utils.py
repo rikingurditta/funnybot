@@ -54,9 +54,9 @@ class Utils(commands.Cog):
         await interaction.response.defer()
         ret = db.insert_new_word(word, definition)
         if ret:
-            await interaction.followup.send(content=f"Inserted {word} into db with definition {definition}.")
+            await interaction.followup.send(content=f"Inserted word \"{word}\" into db with definition \"{definition}\".")
         else:
-            await interaction.followup.send(content=f"Failed to insert {word} into db (word already exists).")
+            await interaction.followup.send(content=f"Failed to insert word \"{word}\" into db (word already exists).")
 
     @app_commands.command(
         name="delete_word",
