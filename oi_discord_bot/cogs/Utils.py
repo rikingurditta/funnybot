@@ -52,7 +52,10 @@ class Utils(commands.Cog):
     @app_commands.checks.has_any_role(OI_DEV_ROLE_ID)
     async def insert_word(self, interaction: Interaction, word: str, definition: str):
         await interaction.response.defer()
-        ret = db.insert_new_word(word, definition)
+        if not word.isalpha():
+            await interaction.followup.send(content=f"Word \"{word}\" is not valid.")
+            return
+        ret = db.insert_new_word(word.lower(), definition)
         if ret:
             await interaction.followup.send(content=f"Inserted word \"{word}\" into db with definition \"{definition}\".")
         else:
