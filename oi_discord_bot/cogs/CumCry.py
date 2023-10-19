@@ -78,7 +78,7 @@ class CumCry(commands.Cog):
         i = 1
         leaderboard = "## hangman winners leaderboard\n"
         leaderboard += "```\n"
-        leaderboard += f'\| {"rank":>4} \| {"wins":>4} \| {"ratio":>5} \| {"name":^20} \|\n'
+        leaderboard += f'| {"rank":>4} | {"wins":>4} | {"ratio":>5} | {"name":^20} |\n'
         unknown_users = []
         for row in table:
             if row[1] == 0:
@@ -91,7 +91,7 @@ class CumCry(commands.Cog):
             except:
                 unknown_users.append(row[0])
                 continue
-            leaderboard += f'\| {i:>4} \| {row[1]:>4} \| {round(row[1]/max(row[2] + row[1], 1), 2):>5} \| {user.display_name[:20]:^20} \|\n'
+            leaderboard += f'| {i:>4} | {row[1]:>4} | {round(row[1]/max(row[2] + row[1], 1), 2):>5} | {user.display_name[:20]:<20} |\n'
             i += 1
         leaderboard += "```"
         log.info("unknown users: " + str(unknown_users))
