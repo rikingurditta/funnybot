@@ -17,7 +17,7 @@ from discord import (
 import pytz
 
 from config import *
-from utils import get_channel, backup_oi_db, backup_oi_log
+from oi_utils import get_channel, backup_oi_db, backup_oi_log
 import logging
 from sigma_clone.hangman import hangman
 
