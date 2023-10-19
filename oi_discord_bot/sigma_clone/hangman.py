@@ -58,7 +58,7 @@ def get_definition(word):
     """
     definition = ""
     query = parser.fetch(word)
-    if query[0]["definitions"]:
+    if len(query) > 0 and query[0]["definitions"]:
         for i in range(len(query[0]["definitions"])):
             definition += f'{query[0]["definitions"][i]["partOfSpeech"]}:\n'
             for j in range(len(query[0]["definitions"][i]["text"])):
@@ -71,6 +71,7 @@ def get_definition(word):
 
             definition += "\n"
     else:
+        log.error(f"No definition found for {word}")
         return "No definition found on wiktionary... :("
 
     return definition
