@@ -68,7 +68,7 @@ class CumCry(commands.Cog):
         await interaction.followup.send(leaderboard)
 
     @app_commands.command(
-        name="hangman_leaderboard",
+        name="hangmanleaderboard",
         description="leaderboard for sigma hangman wins",
     )
     @app_commands.guilds(discord.Object(id=OI_GUILD_ID))
