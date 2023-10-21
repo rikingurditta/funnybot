@@ -182,7 +182,7 @@ async def hangman(bot, db, message, funny=False):
             except Exception as e:
                 log.error(e)
                 timeout = True
-                await message.channel.send("oopsies doopsies i did a fucky wucky :3 <@!567130234542096385>")
+                await message.channel.send("oopsies doopsies i did a fucky wucky :3 <@!189215545206374400>")
 
         if gallows.dead:
             lose_title = f"💥 Ooh, sorry {author}, it was {gallows.word}."
