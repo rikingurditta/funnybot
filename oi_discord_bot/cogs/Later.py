@@ -120,7 +120,11 @@ class Later(commands.Cog):
 
     async def remove_later_role(self, user_id: int, remove_time):
         log.info("removing later role for {}".format(user_id))
-        await remove_role(self.client, LATER_ROLE_ID, user_id)
+        try:
+            await remove_role(self.client, LATER_ROLE_ID, user_id)
+        except Exception as e:
+            log.warning(e)
+            log.warning("Exception occurred while removing later role. User likely left the server.")
         jobs = db.get_later_deletion_jobs_by_id(str(user_id))
         for job in jobs:
             try:
