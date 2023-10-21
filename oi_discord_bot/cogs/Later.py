@@ -49,6 +49,7 @@ class Later(commands.Cog):
                 self.remove_later_role,
                 DateTrigger(run_date=remove_time),
                 args=[member_id, str(remove_time)],
+                misfire_grace_time=None,
             )
             latermin_entry = db.get_last_later_time(member_id)
             if latermin_entry is None:
@@ -109,6 +110,7 @@ class Later(commands.Cog):
             self.remove_later_role,
             DateTrigger(run_date=remove_time),
             args=[user.id, remove_time],
+            misfire_grace_time=None,
         )
         log.info(str(self.scheduler.get_jobs()))
         db.create_later_delete_job(str(user.id), remove_time, ret_job.id)
