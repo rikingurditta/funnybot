@@ -122,7 +122,7 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
         log.info("reaction {}".format(payload.emoji.name))
         for react in reactions:
             if message.created_at < datetime.datetime.utcnow().replace(
-                tzinfo=None
+                tzinfo=datetime.timezone.utc
             ) - datetime.timedelta(days=MAX_STARBOARD_LOOKBACK):
                 log.warning(f"message {message.content} too old, not starring...")
                 break
