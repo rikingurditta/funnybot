@@ -121,9 +121,9 @@ async def on_raw_reaction_add(payload: RawReactionActionEvent):
         reactions = message.reactions
         log.info("reaction {}".format(payload.emoji.name))
         for react in reactions:
-            if message.created_at < datetime.datetime.utcnow() - datetime.timedelta(
-                days=MAX_STARBOARD_LOOKBACK
-            ):
+            if message.created_at < datetime.datetime.utcnow().replace(
+                tzinfo=None
+            ) - datetime.timedelta(days=MAX_STARBOARD_LOOKBACK):
                 log.warning(f"message {message.content} too old, not starring...")
                 break
             if react.emoji == "⭐" and react.count >= STAR_THRESHOLD:
