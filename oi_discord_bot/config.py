@@ -9,14 +9,15 @@ STAR_THRESHOLD = 5
 DEL_THRESHOLD = 5
 CONFESSIONS_PER_DAY = 2
 WYR_PER_DAY = 2
+MAX_STARBOARD_LOOKBACK = 14
 IMAGES_CHANNEL_NAME = "images"
 OI_DB_BACKUP_COMMAND = (
-    "scp -P 1337 oi.db remilia@192.168.2.11:/mnt/storage/oi_bak/{}.db".format(
+    "scp -P 1337 oi.db remilia@10.88.111.37:/mnt/storage/oi_bak/{}.db".format(
         datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     )
 )
 OI_LOG_BACKUP_COMMAND = (
-    "scp -P 1337 oi.log remilia@192.168.2.11:/mnt/storage/oi_bak/{}.log".format(
+    "scp -P 1337 oi.log remilia@10.88.111.37:/mnt/storage/oi_bak/{}.log".format(
         datetime.datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     )
 )
